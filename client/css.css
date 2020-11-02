@@ -1,0 +1,207 @@
+::-webkit-scrollbar {
+    width: 0.2em;
+}
+
+::-webkit-scrollbar-track {
+    
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+}
+
+body{
+    font-family: 'Ubuntu', sans-serif;
+    background-color: #2d2d2d;
+    margin: 0;
+    padding: 0;
+}
+canvas{
+    width: 100%;
+    height: 100%;
+}
+
+#editor {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 847px;
+    height: 741px;
+    font-size: 1em;
+}
+
+
+.edit-panel {
+    position: absolute;
+    top: 0;
+    display: flex;
+    max-width: 100%;
+}
+
+.edit-panel .scripts-tab {
+    display: flex;
+    background-color: #2f3129;
+}
+
+.scripts-tab .item {
+    color: #a5a5a5;
+    padding: 0.8em;
+    font-size: 1em;
+    border-right: solid 2px #2c2d26;
+}
+
+.scripts-tab .item:hover {
+    background-color: #3b3e34;
+    color: #fff;
+}
+
+.explorer {
+    background-color: #e0e0e0;
+}
+
+.explorer .item {
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+    padding-left: 0.7em;
+    padding-right: 0.7em;
+    color: #696969;
+}
+
+.explorer .item:hover {
+    background-color: #fff;
+    color: #151515;
+}
+
+.explorer .active {
+    background-color: #fff;
+    color: #151515;
+}
+
+.explorer .disabled {
+    opacity: 0.2;
+}
+
+.explorer .bar {
+    display: flex;
+    padding-left: 9px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    background-color: #e0e0e0;
+    padding-right: 9px;
+}
+
+.explorer .bar .title {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.explorer .bar .add {
+    font-size: 16px;
+    width: 22px;
+    text-align: center;
+    padding-top: 0px;
+    background-color: #cecece;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-left: 13px;
+    margin-right: 3px;
+    height: 21px;
+}
+.explorer .bar .add:active {
+    background-color: #dbdbdb;
+}
+
+.explorer .bar .item {
+    font-size: 13px;
+    text-align: center;
+    background-color: #cecece;
+    border-radius: 3px;
+    margin-left: 5px;
+    margin-right: 0px;
+    padding: 4px;
+}
+.explorer .bar .item:active {
+    background-color: #dbdbdb;
+}
+
+.button{
+    cursor: pointer;
+    user-select: none;
+}
+
+.ace_layer.ace_gutter-layer.ace_folding-enabled {
+    background-color: #272822;
+}
+
+.context-menu{
+    z-index: 4;
+    position: absolute;
+    background-color: #ffffff;
+    padding: 3px;
+    width: fit-content;
+    box-shadow: 0 0 4px 0px rgb(0 0 0 / 19%);
+}
+
+.context-menu .item{
+    
+color: #424242;
+    
+padding-left: 14px;
+    
+font-size: 0.8em;
+    
+padding-top: 4px;
+    
+padding-bottom: 4px;
+    
+padding-right: 14px;
+}
+
+.context-menu .item:hover{
+    background-color: #ccc;
+}
+
+.scripts-shop {
+    background-color: #292929;
+    padding: 1em;
+    color: #fff;
+    border-left: dashed 2px #232323;
+    overflow-y: auto;
+    max-height: 709px;
+}
+
+.scripts-shop .title {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #a9a9a9;
+    margin-bottom: 4px;
+}
+
+.scripts-shop-list .item .title {
+    font-size: 1.1em;
+    font-weight: normal;
+    color: #dedede;
+}
+
+.scripts-shop-list .item .load-button {
+    background-color: #272727;
+    padding: 0.3em;
+    color: #929292;
+    text-align: center;
+    margin-top: 8px;
+}
+.scripts-shop-list .item .load-button:active {
+    background-color: #313131;
+}
+
+.scripts-shop-list .item {
+    background-color: #2d2d2d;
+    padding: 1em;
+    margin-top: 7px;
+}
+
+.scripts-shop-list .item .description {
+    font-size: 0.8em;
+    color: #777;
+}

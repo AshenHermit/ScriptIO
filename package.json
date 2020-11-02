@@ -1,0 +1,17 @@
+{
+  "name": "script-io",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "ashen hermit",
+  "license": "ISC",
+  "dependencies": {
+    "dropbox": "^7.3.0",
+    "express": "^4.17.1",
+    "isomorphic-fetch": "^3.0.0",
+    "socket.io": "^2.3.0"
+  }
+}
