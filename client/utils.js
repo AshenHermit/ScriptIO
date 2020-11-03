@@ -23,20 +23,25 @@ function addTransform(){
 }
 
 function drawImage(ctx, img, x, y, angle, width){
-    //ctx.setTransform(1,0,0,1,x,y); // set position of image center
     addTransform(1,0,0,1,x,y); // set position of image center
-
     ctx.rotate(angle); // rotate
     var height = (img.height/img.width)*width
-    ctx.drawImage(img,-width/2,-height/2, width, height); // draw image offset so its center is at x,y
-    //ctx.setTransform(1,0,0,1,0,0); // restore default transform
+    ctx.drawImage(img,-width/2,-height/2, width, height);
+    restoreTransform()
+}
+
+function drawWithTransform(ctx, drawFunc, x, y, angle, scale){
+    addTransform(scale,0,0,scale,x,y);
+    ctx.rotate(angle); // rotate
+    drawFunc()
     restoreTransform()
 }
 
 function drawImagePlus(ctx, img, x, y, angle, width, ox=0, oy=0, mirrorX=false, mirrorY=false){
     //ctx.setTransform((mirrorX ? -1 : 1),0,0,(mirrorY ? -1 : 1),x,y); // set position of image center
-    addTransform((mirrorX ? -1 : 1),0,0,(mirrorY ? -1 : 1),x,y); // set position of image center
+    addTransform(1,0,0,1,x,y); // set position of image center
     ctx.rotate(angle); // rotate
+    ctx.scale((mirrorX ? -1 : 1), (mirrorY ? -1 : 1))
     var height = (img.height/img.width)*width
     ctx.drawImage(img,-width/2*(mirrorX ? -1 : 1)+ox,-height/2*(mirrorY ? -1 : 1)+oy, width*(mirrorX ? -1 : 1), height*(mirrorY ? -1 : 1));
     //ctx.setTransform(1,0,0,1,0,0); // restore default transform
@@ -82,6 +87,29 @@ function lineColliderIntersect(p1, p2, col){
     return lineLineIntersect(p1, p2, col.p1, col.p2)
 }
 
+function lineMapIntersect(p1, p2){
+    var point = null
+    var maxDist = 0
+
+    for(var c=0; c<gameMap.colliders.length; c+=1){
+        var p = lineColliderIntersect(p1, p2, gameMap.colliders[c])
+        if(p){
+            dist = ((p.x-p1.x)**2 + (p.y-p1.y)**2)**(0.5)
+            if(point){
+                if(dist < maxDist){
+                    point = p
+                    maxDist = dist
+                }
+            }else{
+                point = p
+                maxDist = dist
+            }
+        }
+    }
+
+    return point
+}
+
 
 function physicsStep(position, velocity, margin){
     var point = [0, 0]
@@ -103,7 +131,7 @@ function physicsStep(position, velocity, margin){
 
         for(var i=0; i<2; i+=1){
             if(p[i]){
-                dist = ((point[i].x-position.x)**2 + (point[i].y-position.y)**2)**(0.5)
+                dist = ((p[i].x-position.x)**2 + (p[i].y-position.y)**2)**(0.5)
                 if(point[i]){
                     if(dist < maxDist[i]){
                         point[i] = p[i]

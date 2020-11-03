@@ -53,6 +53,8 @@ function Player(data){
     }
 
     this.update = function(){
+        this.mousePos.x = cameraPos.x + clientMousePos.x - gCanvas.width/2
+        this.mousePos.y = cameraPos.y + clientMousePos.y - gCanvas.height/2
         
         if(this.token){ // is local player
             if(editorState){
@@ -88,7 +90,13 @@ function Player(data){
 
         //
         for(var i=0; i<this.scriptCtx.length; i++){
-            if(this.scriptCtx[i].update && !this.scriptCtx[i].disabled) this.scriptCtx[i].update(this)
+            if(this.scriptCtx[i].update && !this.scriptCtx[i].disabled) {
+                try{
+                    this.scriptCtx[i].update(this)
+                }catch(err){
+                    console.error(err)
+                }
+            }
         }
 
         Object.keys(this.onPress).forEach((key)=>{
@@ -104,7 +112,13 @@ function Player(data){
         
         //
         for(var i=0; i<this.scriptCtx.length; i++){
-            if(this.scriptCtx[i].draw && !this.scriptCtx[i].disabled) this.scriptCtx[i].draw(ctx, this)
+            if(this.scriptCtx[i].draw && !this.scriptCtx[i].disabled){ 
+                try{
+                    this.scriptCtx[i].draw(ctx, this)
+                }catch(err){
+                    console.error(err)
+                }
+            }
         }
     }
 }
@@ -141,8 +155,8 @@ document.addEventListener('keyup', function(e){
 })
 
 document.addEventListener('mousemove', function(e){
-    localPlayer.mousePos.x = e.clientX
-    localPlayer.mousePos.y = e.clientY
+    clientMousePos.x = e.clientX
+    clientMousePos.y = e.clientY
 })
 
 window.addEventListener('resize', function(e){

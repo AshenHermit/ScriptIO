@@ -35,6 +35,7 @@ var localPlayer = null
 
 var connected = false;
 
+var clientMousePos = vector2()
 var cameraPos = vector2()
 var ctxTransform = [1, 0, 0, 1, 0, 0]
 
