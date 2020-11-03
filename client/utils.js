@@ -3,27 +3,44 @@ function getPlayerIdByUid(uid){
     return players.findIndex(x => x.uid == uid)
 }
 
+function restoreTransform(){
+    gCtx.setTransform(
+        ctxTransform[0],
+        ctxTransform[1],
+        ctxTransform[2],
+        ctxTransform[3],
+        ctxTransform[4],
+        ctxTransform[5]);
+}
+function addTransform(){
+    gCtx.setTransform(
+        ctxTransform[0] * arguments[0],
+        ctxTransform[1] + arguments[1],
+        ctxTransform[2] + arguments[2],
+        ctxTransform[3] * arguments[3],
+        ctxTransform[4] + arguments[4],
+        ctxTransform[5] + arguments[5]);
+}
+
 function drawImage(ctx, img, x, y, angle, width){
-    ctx.setTransform(1,0,0,1,x,y); // set position of image center
+    //ctx.setTransform(1,0,0,1,x,y); // set position of image center
+    addTransform(1,0,0,1,x,y); // set position of image center
+
     ctx.rotate(angle); // rotate
     var height = (img.height/img.width)*width
     ctx.drawImage(img,-width/2,-height/2, width, height); // draw image offset so its center is at x,y
-    ctx.setTransform(1,0,0,1,0,0); // restore default transform
+    //ctx.setTransform(1,0,0,1,0,0); // restore default transform
+    restoreTransform()
 }
 
-function drawImageWithOrigin(ctx, img, x, y, angle, width, ox=0, oy=0){
-    ctx.setTransform(1,0,0,1,x+ox,y+oy); // set position of image center
+function drawImagePlus(ctx, img, x, y, angle, width, ox=0, oy=0, mirrorX=false, mirrorY=false){
+    //ctx.setTransform((mirrorX ? -1 : 1),0,0,(mirrorY ? -1 : 1),x,y); // set position of image center
+    addTransform((mirrorX ? -1 : 1),0,0,(mirrorY ? -1 : 1),x,y); // set position of image center
     ctx.rotate(angle); // rotate
     var height = (img.height/img.width)*width
-    ctx.drawImage(img,-width/2,-height/2, width, height); // draw image offset so its center is at x,y
-    ctx.setTransform(1,0,0,1,0,0); // restore default transform
-}
-
-function drawImageScale(ctx, img, x, y, angle, scaleX, scaleY){
-    ctx.setTransform(scaleX,0,0,scaleY,x,y); // set position of image center
-    ctx.rotate(angle); // rotate
-    ctx.drawImage(img,-img.width/2,-img.height/2); // draw image offset so its center is at x,y
-    ctx.setTransform(1,0,0,1,0,0); // restore default transform
+    ctx.drawImage(img,-width/2*(mirrorX ? -1 : 1)+ox,-height/2*(mirrorY ? -1 : 1)+oy, width*(mirrorX ? -1 : 1), height*(mirrorY ? -1 : 1));
+    //ctx.setTransform(1,0,0,1,0,0); // restore default transform
+    restoreTransform()
 }
 
 

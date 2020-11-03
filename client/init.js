@@ -35,6 +35,15 @@ var localPlayer = null
 
 var connected = false;
 
+var cameraPos = vector2()
+var ctxTransform = [1, 0, 0, 1, 0, 0]
+
+var editPanel = document.getElementById("edit_panel")
+var editorState = false
+
+// intervals
+var updateInterval
+var syncInterval
 
 //map 
-colliders.push(new Collider(0, gCanvas.height-64, 256, gCanvas.height-64))
+colliders.push(new Collider(-512, 32, 1024, 32))

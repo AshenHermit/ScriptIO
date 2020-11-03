@@ -2,14 +2,17 @@
 function ScriptContext(script, player){
     this._script = script
     eval(this._script)
-    if(this.init && !this.disabled)
+    if(this.init && !this.disabled){
         this.init(player)
+    }
 }
 
 function Player(data){
     this.uid = data.uid
     this.token = data.token
     this.username = "player"
+    this.hp = 100
+    this.infoY = 90
 
     this.controls = {
         "KeyW": false,
@@ -18,14 +21,17 @@ function Player(data){
         "KeyD": false,
         "Space": false
     }
+    this.onPress = Object.assign({}, this.controls)
 
     this.scriptCtx = []
     
     this.velocity = vector2()
-    this.position = vector2(64, gCanvas.height - 64)
+    this.position = vector2()
+    this.targetPosition = vector2()
     this.mousePos = vector2()
     this.speed = 1
     this.overrideMovement = false
+    this.overrideRender = false
 
     this.isLocal = function(){
         return this.token !== undefined
@@ -47,7 +53,17 @@ function Player(data){
     }
 
     this.update = function(){
+        
         if(this.token){ // is local player
+            if(editorState){
+                let centerPanelEnd = editPanel.clientWidth-gCanvas.width/2
+                cameraPos.x += ((this.position.x-centerPanelEnd-(gCanvas.width/2 - centerPanelEnd)/2)-cameraPos.x)/3
+            }
+            else{
+                cameraPos.x += (this.position.x-cameraPos.x)/3
+            }
+            cameraPos.y += (this.position.y-cameraPos.y)/3
+
             if(!this.overrideMovement){
                 if(this.controls.KeyW){
                     this.velocity.y -= this.speed
@@ -66,18 +82,25 @@ function Player(data){
                 this.velocity._div(2.0)
             }
         }else{
-            this.position._add((this.velocity.sub(this.position)).div(5.0))
+            this.velocity._set(this.targetPosition.sub(this.position)._div(5))
+            this.position._add(this.velocity)
         }
 
         //
         for(var i=0; i<this.scriptCtx.length; i++){
             if(this.scriptCtx[i].update && !this.scriptCtx[i].disabled) this.scriptCtx[i].update(this)
         }
+
+        Object.keys(this.onPress).forEach((key)=>{
+            if(this.onPress[key]) this.onPress[key] = false
+        })
     }
 
     this.draw = function(ctx){
-        ctx.fillStyle = "#fff"
-        ctx.fillRect(this.position.x - 4, this.position.y - 4, 8, 8)
+        if(!this.overrideRender){
+            ctx.fillStyle = "#fff"
+            ctx.fillRect(this.position.x - 4, this.position.y - 4, 8, 8)
+        }
         
         //
         for(var i=0; i<this.scriptCtx.length; i++){
@@ -95,20 +118,25 @@ function Player(data){
 window.addEventListener("beforeunload", function(e){
     connected = false
     socket.emit('clientDisconnect', {token: localPlayer.token});
+
+    clearInterval(updateInterval)
+    clearInterval(syncInterval)
 }, false);
 
 document.addEventListener('keydown', function(e){
-
     if(localPlayer.controls[e.code] !== undefined && document.activeElement == document.body){
-        localPlayer.controls[e.code] = true
-        if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, controls: localPlayer.controls})
+        if(!localPlayer.controls[e.code]){
+            localPlayer.controls[e.code] = true
+            localPlayer.onPress[e.code] = true
+            if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: e.code, state: true})
+        }
     }
 })
 
 document.addEventListener('keyup', function(e){
     if(localPlayer.controls[e.code] !== undefined && document.activeElement == document.body){
         localPlayer.controls[e.code] = false
-        if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, controls: localPlayer.controls})
+        if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: e.code, state: false})
     }
 })
 
@@ -128,25 +156,32 @@ window.addEventListener('resize', function(e){
 // intervals
 
 function update(){
-    gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height)
 
     //update
     for(var i=0; i<players.length; i++){
         players[i].update()
     }
 
-    for(var i=0; i<players.length; i++){
-        players[i].draw(gCtx)
-    }
+
+    //draw
+    ctxTransform[4] = -cameraPos.x + gCanvas.width/2
+    ctxTransform[5] = -cameraPos.y + gCanvas.height/2
+    restoreTransform()
+
+    gCtx.clearRect(cameraPos.x-gCanvas.width/2, cameraPos.y-gCanvas.height/2, gCanvas.width, gCanvas.height)
 
     for(var i=0; i<colliders.length; i++){
         colliders[i].draw(gCtx)
     }
+
+    for(var i=0; i<players.length; i++){
+        players[i].draw(gCtx)
+    }
 }
 function syncronize(){
-    if(connected) socket.emit('clientSync', {token: localPlayer.token, mousePos: localPlayer.mousePos, position: localPlayer.position});
+    if(connected) socket.emit('clientSync', {token: localPlayer.token, hp: localPlayer.hp, mousePos: localPlayer.mousePos, position: localPlayer.position});
 }
 
-setInterval(update, 1000/60)
-setInterval(syncronize, 1000/16)
+updateInterval = setInterval(update, 1000/60)
+syncInterval = setInterval(syncronize, 1000/18)
 

@@ -50,14 +50,18 @@ socket.on('serverPlayerDisconnect', function (data) {
 
 socket.on('serverClientSync', function (data) {
     if(data.uid!=localPlayer.uid){
-        playerByUid[data.uid].velocity._set(data.position)
+        playerByUid[data.uid].targetPosition._set(data.position)
         playerByUid[data.uid].mousePos._set(data.mousePos)
+        playerByUid[data.uid].hp = data.hp
     }
 });
 
 socket.on('serverClientSyncControls', function (data) {
     if(data.uid!=localPlayer.uid){
-        playerByUid[data.uid].controls = data.controls
+        if(data.state){
+            playerByUid[data.uid].onPress[data.control] = true
+        }
+        playerByUid[data.uid].controls[data.control] = data.state
     }
 });
 

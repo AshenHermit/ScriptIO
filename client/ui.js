@@ -50,6 +50,7 @@ function onEditorShow(){
     document.getElementById("editor").style.display = document.getElementById("editor").style.display=="none" ? "" : "none"
     document.getElementById("scripts_list").style.display = document.getElementById("scripts_list").style.display=="none" ? "" : "none"
     document.getElementById("scripts_shop").style.display = document.getElementById("scripts_shop").style.display=="none" ? "" : "none"
+    editorState = !editorState
 }
 
 // file input
@@ -149,6 +150,7 @@ function ctxMenuFunction(e){
             localScripts[scriptId] = localScripts[scriptId+dir];
             localScripts[scriptId+dir] = b;
             if(selectedScriptId == scriptId) selectedScriptId+=dir
+            else if(selectedScriptId == scriptId+dir) selectedScriptId-=dir
             updateScriptsList()
         }
         setCtxMenuState(false)
