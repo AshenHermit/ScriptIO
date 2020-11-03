@@ -33,6 +33,8 @@ socket.on('local_connect', function (data) {
 </div>`
         
     }).join("")
+
+    buildMap(data.map)
 });
 socket.on('playerConnected', function (data) {
     if(data.uid!=localPlayer.uid) {
@@ -68,4 +70,9 @@ socket.on('serverClientSyncControls', function (data) {
 socket.on('serverClientSetupScripts', function (data) {
     if(data.uid!=localPlayer.uid)
         playerByUid[data.uid].setupScripts(data.scripts)
+});
+
+socket.on('serverLoadMap', function (data) {
+    console.log(data)
+    buildMap(data.map)
 });

@@ -50,11 +50,11 @@ function _vector2(_x, _y){
         return new _vector2(this.x, this.y)._mul(v)
     }
     //
-    this._set = (v)=>{
+    this._set = (v, y)=>{
         if(v.x !== undefined){
             this.x = v.x; this.y = v.y;
         }else{
-            this.x = v; this.y = v;
+            this.x = v; this.y = y;
         }
         return this
     }
@@ -73,11 +73,7 @@ function vector2(_x=0, _y=0){
     return new _vector2(_x, _y)
 }
 
-var colliders = []
 var nextColliderId = 0
-function destroyCollider(col){
-    colliders.splice(colliders.findIndex(x=>x.uid==col.uid), 1)
-}
 
 function Collider(x1, y1, x2, y2){
     this.p1 = vector2(x1, y1)

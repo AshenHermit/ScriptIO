@@ -59,7 +59,6 @@ fileInput.type = "file"
 fileInput.onchange = function(){
     if(fileInput.files.length>0){
         fileInput.files[0].text().then(function(data){
-            console.log(data)
             var data = JSON.parse(data)
             localScripts = data.scripts
             if(localScripts.length>0) onScriptSelect(0, true)
@@ -180,7 +179,6 @@ document.addEventListener('contextmenu', function(e) {
     if(e.target.parentNode.id=="scripts_list"){
         setCtxMenuState(false)
         e.preventDefault()
-        console.log(e)
         contextMenu.style.left = e.pageX+"px"
         contextMenu.style.top  = e.pageY+"px"
         setCtxMenuState(true)

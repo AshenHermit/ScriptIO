@@ -87,7 +87,7 @@ function physicsStep(position, velocity, margin){
     var point = [0, 0]
     var maxDist = [0, 0]
 
-    var p2x = vector2(velocity.x + (margin * (velocity.y<0 ? -1 : 1)), 0)._add(position)
+    var p2x = vector2(velocity.x + (margin * (velocity.x<0 ? -1 : 1)), 0)._add(position)
     var p2y = vector2(0, velocity.y + (margin * (velocity.y<0 ? -1 : 1)))._add(position)
 
     // gCtx.strokeStyle = "#f00"
@@ -96,10 +96,10 @@ function physicsStep(position, velocity, margin){
     // gCtx.lineTo(p2y.x+16, p2y.y);
     // gCtx.stroke();
 
-    for(var c=0; c<colliders.length; c+=1){
+    for(var c=0; c<gameMap.colliders.length; c+=1){
         var p = [0, 0]
-        p[0] = lineColliderIntersect(position, p2x, colliders[c])
-        p[1] = lineColliderIntersect(position, p2y, colliders[c])
+        p[0] = lineColliderIntersect(position, p2x, gameMap.colliders[c])
+        p[1] = lineColliderIntersect(position, p2y, gameMap.colliders[c])
 
         for(var i=0; i<2; i+=1){
             if(p[i]){
@@ -125,7 +125,6 @@ function physicsStep(position, velocity, margin){
             position.x = point[0].x+margin
 
         velocity.x = 0
-        isOnFloor = true
     }
     if(point[1]){
         // y
@@ -138,4 +137,25 @@ function physicsStep(position, velocity, margin){
         isOnFloor = true
     }
     return isOnFloor
+}
+
+function buildMap(data){
+    gameMap.colliders = []
+    nextColliderId = 0
+    gameMap.bgImage = new Image()
+    gameMap.bgImage.onload = function(){
+        let scale = gameMap.bgImage.naturalWidth / 5
+        data.colliders.forEach(col => {
+            gameMap.colliders.push(new Collider(col.p1.x*scale, col.p1.y*scale, col.p2.x*scale, col.p2.y*scale))
+        })
+    }
+    gameMap.bgImage.src = data.image
+}
+
+function loadMap(mapName){
+    socket.emit('clientLoadMap', {name: mapName})
+}
+
+function destroyCollider(col){
+    gameMap.colliders.splice(gameMap.findIndex(x=>x.uid==col.uid), 1)
 }

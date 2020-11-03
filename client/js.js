@@ -170,9 +170,9 @@ function update(){
 
     gCtx.clearRect(cameraPos.x-gCanvas.width/2, cameraPos.y-gCanvas.height/2, gCanvas.width, gCanvas.height)
 
-    for(var i=0; i<colliders.length; i++){
-        colliders[i].draw(gCtx)
-    }
+    if(gameMap.bgImage) drawImage(gCtx, gameMap.bgImage, 0, 0, 0, gameMap.bgImage.naturalWidth)
+
+    //for(var i=0; i<gameMap.colliders.length; i++) gameMap.colliders[i].draw(gCtx)
 
     for(var i=0; i<players.length; i++){
         players[i].draw(gCtx)

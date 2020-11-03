@@ -3,13 +3,59 @@ var http = require('http');
 var express = require('express'),
     app = module.exports.app = express();
 var socket = require('socket.io');
+var fs = require('fs');
 
 
 var fetch = require('isomorphic-fetch');
 var Dropbox = require('dropbox').Dropbox;
 
 var scriptsShop = {}
+var gameMap = {}
 
+function parseMap(file){
+    gameMap.colliders = []
+
+    let lines = file.split("\n")
+    lines.forEach(line => {
+        if(line.trim()!=""){
+            let type = line.substring(0, line.indexOf(" "))
+            if(type=="collider_line"){
+                line = line.substring(line.indexOf(" ")).replace(new RegExp(" ", "g"), "")
+                let params = line.split("_")
+                p1 = params[0].split(",").map(x=>parseFloat(x))
+                p2 = params[1].split(",").map(x=>parseFloat(x))
+                gameMap.colliders.push({
+                    p1: {x:p1[0], y:p1[1]},
+                    p2: {x:p2[0], y:p2[1]},
+                })
+            }
+        }
+    })
+}
+
+function loadMap(name, callback){
+    let filename = "./maps/" + name + ".map"
+    if (fs.existsSync(filename)) {
+        fs.readFile(filename, 'utf8', function (err, file) {
+            if (err) {
+                return console.log(err);
+            }
+            parseMap(file)
+            fs.readFile(filename.replace(".map", ".jpg"), 'base64', function (err, imageFile) {
+                if (err) {
+                    return console.log(err);
+                }
+                gameMap.image = 'data:image/jpeg;base64,' + imageFile
+                console.log("map loaded: '"+filename+"'")
+                if(callback) callback()
+            })
+        })
+    }else{
+        console.log("map '"+filename+"' does not exist")
+    }
+}
+
+/*
 if(process.argv.length>3){
     var dbx = new Dropbox({
         accessToken:  process.argv[3], 
@@ -27,6 +73,18 @@ if(process.argv.length>3){
         
     })
 }
+*/
+
+fs.readFile('./scriptsShop.json', 'utf8', function (err,data) {
+    if (err) {
+        return console.log(err);
+    }
+    scriptsShop = JSON.parse(data)
+    console.log("scripts shop loaded")
+});
+
+loadMap("test")
+
 
 
 // starting server
@@ -41,6 +99,7 @@ server.listen(3000, ip);  //listen on port 3000
 console.log("created server: "+ip+":3000");
 
 app.use(express.static(path.join(__dirname, 'client')));
+app.use(express.static(path.join(__dirname, 'maps')));
 
 app.get('/', (req, res, next) => {
     res.sendFile(path.join(__dirname, 'client/index.html'));
@@ -82,6 +141,7 @@ io.sockets.on('connection', function (socket) {
         token: generateToken(),
         connections: Object.keys(playerByUid).map((x)=>{return {uid: parseInt(x), scripts: playerByUid[x].scripts}}),
         scriptsShop: scriptsShop,
+        map: gameMap,
     }
     socket.emit('local_connect', data);
     var newPlayer = new Player(data)
@@ -121,4 +181,10 @@ io.sockets.on('connection', function (socket) {
         delete data.token
         io.sockets.emit('serverClientSetupScripts', data);
     });
+
+    socket.on('clientLoadMap', function(data){
+        loadMap(data.name, function(){
+            io.sockets.emit('serverLoadMap', {map: gameMap})
+        })
+    })
 })

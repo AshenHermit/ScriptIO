@@ -45,5 +45,10 @@ var editorState = false
 var updateInterval
 var syncInterval
 
+var gameMap = {
+    bgImage: null,
+    colliders: []
+}
+
 //map 
-colliders.push(new Collider(-512, 32, 1024, 32))
+gameMap.colliders.push(new Collider(-512, 32, 1024, 32))
