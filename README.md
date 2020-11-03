@@ -16,7 +16,7 @@ node index.js <ip>
 
 ## Editing maps
 This app can parse map files whose content is just a list of colliders, so far.  
-As a map editor I use *Blender* with my own exporter, you can download it from the [here](https://drive.google.com/file/d/17z1lCW57oHxwiDmuP5jRW4_obvUO6ykc/view?usp=sharing).  
+As a map editor I use *Blender* with my own exporter, you can download it from [here](https://drive.google.com/file/d/17z1lCW57oHxwiDmuP5jRW4_obvUO6ykc/view?usp=sharing).  
 To write map file with it, you need:
 * Create collection named with the name of the map.
 * Сreate *Image Reference* object in collection.
