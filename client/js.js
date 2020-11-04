@@ -32,6 +32,7 @@ function Player(data){
     this.speed = 1
     this.overrideMovement = false
     this.overrideRender = false
+    this.overrideCameraMotion = false
 
     this.isLocal = function(){
         return this.token !== undefined
@@ -53,18 +54,19 @@ function Player(data){
     }
 
     this.update = function(){
-        this.mousePos.x = cameraPos.x + clientMousePos.x - gCanvas.width/2
-        this.mousePos.y = cameraPos.y + clientMousePos.y - gCanvas.height/2
-        
         if(this.token){ // is local player
+            this.mousePos.x = cameraPos.x + clientMousePos.x - gCanvas.width/2
+            this.mousePos.y = cameraPos.y + clientMousePos.y - gCanvas.height/2
+
             if(editorState){
                 let centerPanelEnd = editPanel.clientWidth-gCanvas.width/2
                 cameraPos.x += ((this.position.x-centerPanelEnd-(gCanvas.width/2 - centerPanelEnd)/2)-cameraPos.x)/3
+                cameraPos.y += (this.position.y-cameraPos.y)/3
             }
-            else{
+            else if(!this.overrideCameraMotion){
                 cameraPos.x += (this.position.x-cameraPos.x)/3
+                cameraPos.y += (this.position.y-cameraPos.y)/3
             }
-            cameraPos.y += (this.position.y-cameraPos.y)/3
 
             if(!this.overrideMovement){
                 if(this.controls.KeyW){

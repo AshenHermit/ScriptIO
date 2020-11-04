@@ -13,7 +13,7 @@ function updateScriptsList(){
         }
 
         return `<div onClick="onScriptSelect(`+i+`)" data-script-id="`+i+`" class="item button `+(selectedScriptId==i ? "active" : "")+` `+(disabled ? "disabled" : "")+`">`+ 
-            s.substring(s.indexOf("//")+"//".length, s.indexOf("\n")).replaceAll(" ", "")
+            s.substring(s.indexOf("//")+"//".length, s.indexOf("\n", s.indexOf("//"))).replaceAll(" ", "")
         +`</div>`
     }).join("\n")
 }
@@ -121,7 +121,7 @@ function ctxMenuFunction(e){
         scriptId = parseInt(ctxMenuTarget.getAttribute("data-script-id"))
         var s = localScripts[scriptId]
         let disIdx = s.indexOf("this.disabled")
-        if(disIdx != -1 && s.substring(s.lastIndexOf("\n", disIdx)+1, disIdx) == ""){    
+        if(disIdx != -1 && (s.charAt(disIdx-1) == "\n" || disIdx==0)){
             let value = s.substring(s.indexOf("=", disIdx)+1, s.indexOf("\n", disIdx)).replaceAll(" ", "")
             let disabled = (value != "0" && value != "false" && value != "null")
             s = 
@@ -129,11 +129,7 @@ function ctxMenuFunction(e){
             + "this.disabled = " + (disabled ? "false" : "true")
             + s.substring(s.indexOf("\n", disIdx))
         }else{
-            let nlIdx = s.indexOf("\n")
-            s = 
-            s.substring(0, nlIdx)
-            + "\nthis.disabled = true"
-            + s.substring(nlIdx)
+            s = "this.disabled = true\n"+s
         }
         localScripts[scriptId] = s
         setCtxMenuState(false)
@@ -143,7 +139,7 @@ function ctxMenuFunction(e){
     // moving
     }else if(e.target.innerText == "move up" || e.target.innerText == "move down"){
         scriptId = parseInt(ctxMenuTarget.getAttribute("data-script-id"))
-        let dir = (e.target.innerText == "move down" ? 1 : -1) 
+        let dir = (e.target.innerText == "move down" ? 1 : -1)
         if(!(dir == -1 && scriptId==0) && !(dir == 1 && scriptId>=localScripts.length-1)){
             var b = localScripts[scriptId];
             localScripts[scriptId] = localScripts[scriptId+dir];
@@ -167,7 +163,7 @@ function ctxMenuFunction(e){
             updateScriptsList()
         }
         setCtxMenuState(false)
-    }
+    }a
 }
 
 var contextItems = contextMenu.children
