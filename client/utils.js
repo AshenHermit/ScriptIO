@@ -87,25 +87,32 @@ function lineColliderIntersect(p1, p2, col){
     return lineLineIntersect(p1, p2, col.p1, col.p2)
 }
 
-function lineMapIntersect(p1, p2){
+function lineMapIntersect(p1, p2, physics=false){
     var point = null
     var maxDist = 0
-
+    var col = -1
     for(var c=0; c<gameMap.colliders.length; c+=1){
         var p = lineColliderIntersect(p1, p2, gameMap.colliders[c])
-        if(p){
-            dist = ((p.x-p1.x)**2 + (p.y-p1.y)**2)**(0.5)
-            if(point){
-                if(dist < maxDist){
+        if((physics && gameMap.colliders[c].physics) || !physics){
+            if(p){
+                dist = ((p.x-p1.x)**2 + (p.y-p1.y)**2)**(0.5)
+                if(point){
+                    if(dist < maxDist){
+                        point = p
+                        maxDist = dist
+                        col = c
+                    }
+                }else{
                     point = p
                     maxDist = dist
+                    col = c
                 }
-            }else{
-                point = p
-                maxDist = dist
             }
         }
     }
+
+    if(point)
+        point.collider = gameMap.colliders[col]
 
     return point
 }
@@ -164,7 +171,7 @@ function physicsStep(position, velocity, margin){
     var p2x = vector2(velocity.x + (margin * (velocity.x<0 ? -1 : 1)), 0)._add(position)
     var p2y = vector2(0, velocity.y + (margin * (velocity.y<0 ? -1 : 1)))._add(position)
 
-    let point = lineMapIntersect(position, p2x)
+    let point = lineMapIntersect(position, p2x, true)
 
     let isOnFloor = false
     if(point){
@@ -177,7 +184,7 @@ function physicsStep(position, velocity, margin){
         velocity.x = 0
     }
     position.x+=velocity.x*2
-    point = lineMapIntersect(position, p2y)
+    point = lineMapIntersect(position, p2y, true)
     if(point){
         // y
         if(position.y < point.y)
@@ -212,5 +219,9 @@ function loadMap(mapName){
 }
 
 function destroyCollider(col){
-    gameMap.colliders.splice(gameMap.findIndex(x=>x.uid==col.uid), 1)
+    gameMap.colliders.splice(gameMap.colliders.findIndex(x=>x.uid==col.uid), 1)
+}
+
+function createCollider(col){
+    gameMap.colliders.push(col)
 }

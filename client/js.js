@@ -156,6 +156,25 @@ document.addEventListener('keyup', function(e){
     }
 })
 
+function mouseEvent(e, state){
+    let code = "MouseM"
+    if(e.button == 0)
+        code = "MouseL"
+    else if(e.button == 2)
+        code = "MouseR"
+
+    localPlayer.onPress[code] = state
+    localPlayer.controls[code] = state
+    if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: code, state: state})
+}
+
+document.addEventListener('mousedown', function(e){
+    mouseEvent(e, true)
+})
+document.addEventListener('mouseup', function(e){
+    mouseEvent(e, false)
+})
+
 document.addEventListener('mousemove', function(e){
     clientMousePos.x = e.clientX
     clientMousePos.y = e.clientY

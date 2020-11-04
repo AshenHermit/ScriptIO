@@ -81,6 +81,7 @@ function Collider(x1, y1, x2, y2){
 
     this.uid = nextColliderId
     nextColliderId+=1
+    this.physics = true
 
     this.draw = function(ctx){
         ctx.strokeStyle = "#fff"
