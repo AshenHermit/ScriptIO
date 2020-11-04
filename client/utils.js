@@ -112,17 +112,11 @@ function lineMapIntersect(p1, p2){
 
 
 function physicsStep(position, velocity, margin){
-    var point = [0, 0]
+    /*
     var maxDist = [0, 0]
 
     var p2x = vector2(velocity.x + (margin * (velocity.x<0 ? -1 : 1)), 0)._add(position)
     var p2y = vector2(0, velocity.y + (margin * (velocity.y<0 ? -1 : 1)))._add(position)
-
-    // gCtx.strokeStyle = "#f00"
-    // gCtx.beginPath();
-    // gCtx.moveTo(position.x+16, position.y);
-    // gCtx.lineTo(p2y.x+16, p2y.y);
-    // gCtx.stroke();
 
     for(var c=0; c<gameMap.colliders.length; c+=1){
         var p = [0, 0]
@@ -144,7 +138,7 @@ function physicsStep(position, velocity, margin){
             }
         }
     }
-    let isOnFloor = false
+
     if(point[0]){
         // x
         if(position.x < point[0].x)
@@ -164,6 +158,39 @@ function physicsStep(position, velocity, margin){
         velocity.y = 0
         isOnFloor = true
     }
+    */
+    //let dir = vector2(velocity.x + (margin * (velocity.x<0 ? -1 : 1)), velocity.y + (margin * (velocity.y<0 ? -1 : 1)))._add(position)
+    
+    var p2x = vector2(velocity.x + (margin * (velocity.x<0 ? -1 : 1)), 0)._add(position)
+    var p2y = vector2(0, velocity.y + (margin * (velocity.y<0 ? -1 : 1)))._add(position)
+
+    let point = lineMapIntersect(position, p2x)
+
+    let isOnFloor = false
+    if(point){
+        // x
+        if(position.x < point.x)
+            position.x = point.x-margin
+        else
+            position.x = point.x+margin
+
+        velocity.x = 0
+    }
+    position.x+=velocity.x*2
+    point = lineMapIntersect(position, p2y)
+    if(point){
+        // y
+        if(position.y < point.y)
+            position.y = point.y-margin
+        else
+            position.y = point.y+margin
+
+        velocity.y = 0
+        isOnFloor = true
+    }
+    position.y+=velocity.y
+    position.x-=velocity.x*1
+
     return isOnFloor
 }
 

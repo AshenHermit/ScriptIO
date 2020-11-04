@@ -98,6 +98,11 @@ if(process.argv.length>2) ip = process.argv[2]
 server.listen(3000, ip);  //listen on port 3000
 console.log("created server: "+ip+":3000");
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 app.use(express.static(path.join(__dirname, 'client')));
 app.use(express.static(path.join(__dirname, 'maps')));
 
