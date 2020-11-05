@@ -40,11 +40,20 @@ var cameraPos = vector2()
 var ctxTransform = [1, 0, 0, 1, 0, 0]
 
 var editPanel = document.getElementById("edit_panel")
+var fileDropArea = document.getElementById("file_drop_area")
 var editorState = false
 
 // intervals
 var updateInterval
 var syncInterval
+
+var lastCalledTime = Date.now();
+var fps = 0
+var fpsText = document.getElementById("fps_text")
+
+var cameraShakeAmount = 0
+var cameraShakeVector = vector2()
+var cameraShakeTargetVector = vector2()
 
 var gameMap = {
     bgImage: null,

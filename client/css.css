@@ -206,3 +206,26 @@ padding-right: 14px;
     font-size: 0.8em;
     color: #777;
 }
+
+.fps-text {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: #fff;
+    user-select: none;
+}
+
+.drop-file {
+    position: inherit;
+    text-align: center;
+    width: 100%;
+    z-index: 6;
+    height: 100%;
+    color: #fff;
+    background-color: rgb(0 0 0 / 48%);
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+}

@@ -56,15 +56,18 @@ function onEditorShow(){
 // file input
 var fileInput = document.createElement("input")
 fileInput.type = "file"
-fileInput.onchange = function(){
-    if(fileInput.files.length>0){
-        fileInput.files[0].text().then(function(data){
+function loadJsonData(files){
+    if(files.length>0){
+        files[0].text().then(function(data){
             var data = JSON.parse(data)
             localScripts = data.scripts
             if(localScripts.length>0) onScriptSelect(0, true)
-            fileInput.value = ""
         })
     }
+}
+fileInput.onchange = function(){
+    loadJsonData(fileInput.files)
+    fileInput.value = ""
 }
 
 // hotkeys: ctrl shift s, ctrl s ...
@@ -163,7 +166,7 @@ function ctxMenuFunction(e){
             updateScriptsList()
         }
         setCtxMenuState(false)
-    }a
+    }
 }
 
 var contextItems = contextMenu.children
@@ -190,7 +193,30 @@ document.addEventListener('click', function(e) {
     }
 }, false);
 
-
+editPanel.addEventListener('dragenter', function(e){
+    e.stopPropagation()
+    e.preventDefault()
+    fileDropArea.style.display = ""
+}, false)
+editPanel.addEventListener('dragleave', function(e){
+    e.stopPropagation()
+    e.preventDefault()
+    fileDropArea.style.display = "none"
+}, false)
+editPanel.addEventListener('drop', function(e){
+    e.stopPropagation()
+    e.preventDefault()
+    loadJsonData(e.dataTransfer.files)
+    fileDropArea.style.display = "none"
+})
+window.addEventListener("dragover",function(e){
+    e = e || event;
+    e.preventDefault();
+},false);
+window.addEventListener("drop",function(e){
+    e = e || event;
+    e.preventDefault();
+},false);
 
 // scripts shop
 

@@ -14,14 +14,14 @@ function Player(data){
     this.hp = 100
     this.infoY = 90
 
-    this.controls = {
+    this.isPressed = {
         "KeyW": false,
         "KeyA": false,
         "KeyS": false,
         "KeyD": false,
         "Space": false
     }
-    this.onPress = Object.assign({}, this.controls)
+    this.onPress = Object.assign({}, this.isPressed)
 
     this.scriptCtx = []
     
@@ -31,7 +31,7 @@ function Player(data){
     this.mousePos = vector2()
     this.speed = 1
     this.overrideMovement = false
-    this.overrideRender = false
+    this.overrideDraw = false
     this.overrideCameraMotion = false
 
     this.isLocal = function(){
@@ -58,6 +58,7 @@ function Player(data){
             this.mousePos.x = cameraPos.x + clientMousePos.x - gCanvas.width/2
             this.mousePos.y = cameraPos.y + clientMousePos.y - gCanvas.height/2
 
+
             if(editorState){
                 let centerPanelEnd = editPanel.clientWidth-gCanvas.width/2
                 cameraPos.x += ((this.position.x-centerPanelEnd-(gCanvas.width/2 - centerPanelEnd)/2)-cameraPos.x)/3
@@ -69,16 +70,16 @@ function Player(data){
             }
 
             if(!this.overrideMovement){
-                if(this.controls.KeyW){
+                if(this.isPressed.KeyW){
                     this.velocity.y -= this.speed
                 }
-                if(this.controls.KeyA){
+                if(this.isPressed.KeyA){
                     this.velocity.x -= this.speed
                 }
-                if(this.controls.KeyS){
+                if(this.isPressed.KeyS){
                     this.velocity.y += this.speed
                 }
-                if(this.controls.KeyD){
+                if(this.isPressed.KeyD){
                     this.velocity.x += this.speed
                 }
 
@@ -107,7 +108,7 @@ function Player(data){
     }
 
     this.draw = function(ctx){
-        if(!this.overrideRender){
+        if(!this.overrideDraw){
             ctx.fillStyle = "#fff"
             ctx.fillRect(this.position.x - 4, this.position.y - 4, 8, 8)
         }
@@ -140,9 +141,10 @@ window.addEventListener("beforeunload", function(e){
 }, false);
 
 document.addEventListener('keydown', function(e){
-    if(localPlayer.controls[e.code] !== undefined && document.activeElement == document.body){
-        if(!localPlayer.controls[e.code]){
-            localPlayer.controls[e.code] = true
+    //if(localPlayer.isPressed[e.code] !== undefined && document.activeElement == document.body){
+    if(document.activeElement == document.body){
+        if(!localPlayer.isPressed[e.code]){
+            localPlayer.isPressed[e.code] = true
             localPlayer.onPress[e.code] = true
             if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: e.code, state: true})
         }
@@ -150,8 +152,9 @@ document.addEventListener('keydown', function(e){
 })
 
 document.addEventListener('keyup', function(e){
-    if(localPlayer.controls[e.code] !== undefined && document.activeElement == document.body){
-        localPlayer.controls[e.code] = false
+    //if(localPlayer.isPressed[e.code] !== undefined && document.activeElement == document.body){
+    if(document.activeElement == document.body){
+        localPlayer.isPressed[e.code] = false
         if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: e.code, state: false})
     }
 })
@@ -164,18 +167,19 @@ function mouseEvent(e, state){
         code = "MouseR"
 
     localPlayer.onPress[code] = state
-    localPlayer.controls[code] = state
+    localPlayer.isPressed[code] = state
     if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: code, state: state})
 }
 
-document.addEventListener('mousedown', function(e){
+gCanvas.addEventListener('mousedown', function(e){
+    if(connected) socket.emit('clientSync', {token: localPlayer.token, hp: localPlayer.hp, mousePos: localPlayer.mousePos, position: localPlayer.position});
     mouseEvent(e, true)
 })
-document.addEventListener('mouseup', function(e){
+gCanvas.addEventListener('mouseup', function(e){
     mouseEvent(e, false)
 })
 
-document.addEventListener('mousemove', function(e){
+gCanvas.addEventListener('mousemove', function(e){
     clientMousePos.x = e.clientX
     clientMousePos.y = e.clientY
 })
@@ -197,6 +201,12 @@ function update(){
         players[i].update()
     }
 
+    cameraShakeTargetVector._set(Math.random()-0.5, Math.random()-0.5)._mul(cameraShakeAmount)
+    cameraShakeVector.x += (cameraShakeTargetVector.x-cameraShakeVector.x)/5
+    cameraShakeVector.y += (cameraShakeTargetVector.y-cameraShakeVector.y)/5 
+    cameraPos._add(cameraShakeVector)
+    cameraShakeAmount = Math.max(cameraShakeAmount-2, 0)
+
 
     //draw
     ctxTransform[4] = -cameraPos.x + gCanvas.width/2
@@ -205,16 +215,21 @@ function update(){
 
     gCtx.clearRect(cameraPos.x-gCanvas.width/2, cameraPos.y-gCanvas.height/2, gCanvas.width, gCanvas.height)
 
-    if(gameMap.bgImage) drawImage(gCtx, gameMap.bgImage, 0, 0, 0, gameMap.bgImage.naturalWidth)
+    if(gameMap.bgImage) drawImage(gCtx, gameMap.bgImage, 0, 0, gameMap.bgImage.naturalWidth, 0)
 
     //for(var i=0; i<gameMap.colliders.length; i++) gameMap.colliders[i].draw(gCtx)
 
     for(var i=0; i<players.length; i++){
         players[i].draw(gCtx)
     }
+
+    delta = (Date.now() - lastCalledTime)/1000
+    lastCalledTime = Date.now()
+    fps = 1/delta
 }
 function syncronize(){
     if(connected) socket.emit('clientSync', {token: localPlayer.token, hp: localPlayer.hp, mousePos: localPlayer.mousePos, position: localPlayer.position});
+    fpsText.innerHTML = Math.round(fps)
 }
 
 updateInterval = setInterval(update, 1000/60)

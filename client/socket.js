@@ -5,12 +5,12 @@ socket.on('local_connect', function (data) {
     playerByUid[data.uid] = localPlayer
     players.push(localPlayer)
     connected = true
-
+    //data.connections.reverse()
     for(var i=0; i<data.connections.length; i++){
         var newPlayer = new Player({uid: data.connections[i].uid})
         newPlayer.setupScripts(data.connections[i].scripts)
         playerByUid[data.connections[i].uid] = newPlayer
-        players.push(newPlayer)
+        players.unshift(newPlayer)
     }
     scriptsShop = data.scriptsShop
     
@@ -63,7 +63,7 @@ socket.on('serverClientSyncControls', function (data) {
         if(data.state){
             playerByUid[data.uid].onPress[data.control] = true
         }
-        playerByUid[data.uid].controls[data.control] = data.state
+        playerByUid[data.uid].isPressed[data.control] = data.state
     }
 });
 

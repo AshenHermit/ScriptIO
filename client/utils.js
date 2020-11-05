@@ -3,6 +3,10 @@ function getPlayerIdByUid(uid){
     return players.findIndex(x => x.uid == uid)
 }
 
+function cameraShake(amount){
+    cameraShakeAmount += amount
+}
+
 function restoreTransform(){
     gCtx.setTransform(
         ctxTransform[0],
@@ -22,30 +26,53 @@ function addTransform(){
         ctxTransform[5] + arguments[5]);
 }
 
-function drawImage(ctx, img, x, y, angle, width){
-    addTransform(1,0,0,1,x,y); // set position of image center
-    ctx.rotate(angle); // rotate
-    var height = (img.height/img.width)*width
-    ctx.drawImage(img,-width/2,-height/2, width, height);
-    restoreTransform()
+function createImage(src){
+    var img = new Image()
+    img.isLoaded = false
+    img.onload = function(e){
+        this.isLoaded = true
+    }
+    img.src = src
+    return img
 }
 
-function drawWithTransform(ctx, drawFunc, x, y, angle, scale){
+function drawLine(ctx, color, width, fromX, fromY, toX, toY){
+    ctx.strokeStyle = color
+    ctx.lineWidth = width
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+}
+
+function drawImage(ctx, img, x, y, width, angle=0){
+    if(img.isLoaded){
+        addTransform(1,0,0,1,x,y); // set position of image center
+        ctx.rotate(angle); // rotate
+        var height = (img.height/img.width)*width
+        ctx.drawImage(img,-width/2,-height/2, width, height);
+        restoreTransform()
+    }
+}
+
+function drawWithTransform(ctx, drawFunc, x, y, scale, angle=0){
     addTransform(scale,0,0,scale,x,y);
     ctx.rotate(angle); // rotate
     drawFunc()
     restoreTransform()
 }
 
-function drawImagePlus(ctx, img, x, y, angle, width, ox=0, oy=0, mirrorX=false, mirrorY=false){
-    //ctx.setTransform((mirrorX ? -1 : 1),0,0,(mirrorY ? -1 : 1),x,y); // set position of image center
-    addTransform(1,0,0,1,x,y); // set position of image center
-    ctx.rotate(angle); // rotate
-    ctx.scale((mirrorX ? -1 : 1), (mirrorY ? -1 : 1))
-    var height = (img.height/img.width)*width
-    ctx.drawImage(img,-width/2*(mirrorX ? -1 : 1)+ox,-height/2*(mirrorY ? -1 : 1)+oy, width*(mirrorX ? -1 : 1), height*(mirrorY ? -1 : 1));
-    //ctx.setTransform(1,0,0,1,0,0); // restore default transform
-    restoreTransform()
+function drawImagePlus(ctx, img, x, y, width, angle=0, ox=0, oy=0, mirrorX=false, mirrorY=false){
+    if(img.isLoaded){
+        //ctx.setTransform((mirrorX ? -1 : 1),0,0,(mirrorY ? -1 : 1),x,y); // set position of image center
+        addTransform(1,0,0,1,x,y); // set position of image center
+        ctx.rotate(angle); // rotate
+        ctx.scale((mirrorX ? -1 : 1), (mirrorY ? -1 : 1))
+        var height = (img.height/img.width)*width
+        ctx.drawImage(img,-width/2*(mirrorX ? -1 : 1)+ox,-height/2*(mirrorY ? -1 : 1)+oy, width*(mirrorX ? -1 : 1), height*(mirrorY ? -1 : 1));
+        //ctx.setTransform(1,0,0,1,0,0); // restore default transform
+        restoreTransform()
+    }
 }
 
 
@@ -205,11 +232,13 @@ function buildMap(data){
     gameMap.colliders = []
     nextColliderId = 0
     gameMap.bgImage = new Image()
+    gameMap.bgImage.isLoaded = false
     gameMap.bgImage.onload = function(){
         let scale = gameMap.bgImage.naturalWidth / 5
         data.colliders.forEach(col => {
             gameMap.colliders.push(new Collider(col.p1.x*scale, col.p1.y*scale, col.p2.x*scale, col.p2.y*scale))
         })
+        gameMap.bgImage.isLoaded = true
     }
     gameMap.bgImage.src = data.image
 }
