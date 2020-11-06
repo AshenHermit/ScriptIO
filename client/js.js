@@ -1,5 +1,6 @@
 
-function ScriptContext(script, player){
+function ScriptContext(script, player, i){
+    this._id = i
     this._script = script
     eval(this._script)
     if(this.init && !this.disabled){
@@ -13,6 +14,11 @@ function Player(data){
     this.username = "player"
     this.hp = 100
     this.infoY = 90
+    
+    this.rng = new RNG(new Date().getMinutes()+this.uid)
+    this.random = function(){
+        return this.rng.nextFloat()
+    }
 
     this.isPressed = {
         "KeyW": false,
@@ -39,6 +45,8 @@ function Player(data){
     }
 
     this.setupScripts = function(scripts){
+        this.rng = new RNG(new Date().getMinutes()+this.uid)
+
         for(var i=0; i<this.scriptCtx.length; i++){
             if(this.scriptCtx[i].destroy && !this.scriptCtx[i].disabled){
                 this.scriptCtx[i].destroy(this)
@@ -46,7 +54,7 @@ function Player(data){
         }
         this.scriptCtx = []
         for(var i=0; i<scripts.length; i++){
-            this.scriptCtx.push(new ScriptContext(scripts[i], this))
+            this.scriptCtx.push(new ScriptContext(scripts[i], this, i))
         }
     }
     this.emitScripts = function(){

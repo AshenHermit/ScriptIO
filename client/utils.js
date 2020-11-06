@@ -146,54 +146,6 @@ function lineMapIntersect(p1, p2, physics=false){
 
 
 function physicsStep(position, velocity, margin){
-    /*
-    var maxDist = [0, 0]
-
-    var p2x = vector2(velocity.x + (margin * (velocity.x<0 ? -1 : 1)), 0)._add(position)
-    var p2y = vector2(0, velocity.y + (margin * (velocity.y<0 ? -1 : 1)))._add(position)
-
-    for(var c=0; c<gameMap.colliders.length; c+=1){
-        var p = [0, 0]
-        p[0] = lineColliderIntersect(position, p2x, gameMap.colliders[c])
-        p[1] = lineColliderIntersect(position, p2y, gameMap.colliders[c])
-
-        for(var i=0; i<2; i+=1){
-            if(p[i]){
-                dist = ((p[i].x-position.x)**2 + (p[i].y-position.y)**2)**(0.5)
-                if(point[i]){
-                    if(dist < maxDist[i]){
-                        point[i] = p[i]
-                        maxDist[i] = dist
-                    }
-                }else{
-                    point[i] = p[i]
-                    maxDist[i] = dist
-                }
-            }
-        }
-    }
-
-    if(point[0]){
-        // x
-        if(position.x < point[0].x)
-            position.x = point[0].x-margin
-        else
-            position.x = point[0].x+margin
-
-        velocity.x = 0
-    }
-    if(point[1]){
-        // y
-        if(position.y < point[1].y)
-            position.y = point[1].y-margin
-        else
-            position.y = point[1].y+margin
-
-        velocity.y = 0
-        isOnFloor = true
-    }
-    */
-    //let dir = vector2(velocity.x + (margin * (velocity.x<0 ? -1 : 1)), velocity.y + (margin * (velocity.y<0 ? -1 : 1)))._add(position)
     
     var p2x = vector2(velocity.x + (margin * (velocity.x<0 ? -1 : 1)), 0)._add(position)
     var p2y = vector2(0, velocity.y + (margin * (velocity.y<0 ? -1 : 1)))._add(position)
@@ -253,4 +205,59 @@ function destroyCollider(col){
 
 function createCollider(col){
     gameMap.colliders.push(col)
+}
+
+var creationWaitingList = []
+
+function instantiate(player, scriptContext, containerName, object, syncParams){
+    if(player.token){
+        var data = {
+            token: player.token,
+            scriptCtxId: scriptContext._id,
+            containerName: containerName,
+            objectId: scriptContext[containerName].length-1,
+            params: {}
+        }
+        syncParams.forEach(key => {
+            data.params[key] = object[key]
+        })
+        scriptContext[containerName].push(object)
+        if(object.init) object.init(player)
+        socket.emit('clientSyncInstantiate', data)
+    }
+    else{
+        // var data = {
+        //     playerUid: player.uid,
+        //     scriptCtxId: scriptContext._id,
+        //     containerName: containerName,
+        // }
+        // creationWaitingList.push(data)
+        scriptContext[containerName].push(object)
+    }
+}
+
+function socketInstantiateObject(data){
+    console.log(data)
+    let obj = playerByUid[data.uid].scriptCtx[data.scriptCtxId][data.containerName][data.objectId]
+    Object.assign(obj, data.params)
+    obj.init(playerByUid[data.uid])
+}
+
+
+
+function RNG(seed) {
+    // LCG using GCC's constants
+    this.m = 0x80000000; // 2**31;
+    this.a = 1103515245;
+    this.c = 12345;
+
+    this.state = seed ? seed : Math.floor(Math.random() * (this.m - 1));
+}
+RNG.prototype.nextInt = function() {
+    this.state = (this.a * this.state + this.c) % this.m;
+    return this.state;
+}
+RNG.prototype.nextFloat = function() {
+    // returns in range [0,1]
+    return this.nextInt() / (this.m - 1);
 }

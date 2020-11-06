@@ -180,6 +180,12 @@ io.sockets.on('connection', function (socket) {
         io.sockets.emit('serverClientSyncControls', data);
     });
 
+    socket.on('clientSyncInstantiate', function (data) {
+        data.uid = playerByToken[data.token].uid
+        delete data.token
+        io.sockets.emit('serverClientSyncInstantiate', data);
+    });
+
     socket.on('clientSetupScripts', function (data) {
         data.uid = playerByToken[data.token].uid
         playerByToken[data.token].scripts = data.scripts

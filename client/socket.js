@@ -58,6 +58,14 @@ socket.on('serverClientSync', function (data) {
     }
 });
 
+
+socket.on('serverClientSyncInstantiate', function (data) {
+    if(data.uid!=localPlayer.uid){
+        socketInstantiateObject(data)
+    }
+});
+
+
 socket.on('serverClientSyncControls', function (data) {
     if(data.uid!=localPlayer.uid){
         if(data.state){
