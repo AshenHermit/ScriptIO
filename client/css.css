@@ -170,6 +170,7 @@ padding-right: 14px;
     border-left: dashed 2px #232323;
     overflow-y: auto;
     max-height: 709px;
+    border-right: dashed 2px #232323;
 }
 
 .scripts-shop .title {
@@ -177,6 +178,18 @@ padding-right: 14px;
     font-weight: bold;
     color: #a9a9a9;
     margin-bottom: 4px;
+}
+
+.scripts-shop .category {
+    background-color: #323232;
+    padding: 0.4em;
+    border-radius: 5px;
+    color: #8b8b8b;
+    width: fit-content;
+}
+
+.scripts-shop .category:active{
+    background-color: #3b3b3b;
 }
 
 .scripts-shop-list .item .title {

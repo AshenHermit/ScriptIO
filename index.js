@@ -80,6 +80,7 @@ fs.readFile('./scriptsShop.json', 'utf8', function (err,data) {
         return console.log(err);
     }
     scriptsShop = JSON.parse(data)
+    scriptsShop.serverScripts = []
     console.log("scripts shop loaded")
 });
 
@@ -197,5 +198,10 @@ io.sockets.on('connection', function (socket) {
         loadMap(data.name, function(){
             io.sockets.emit('serverLoadMap', {map: gameMap})
         })
+    })
+
+    socket.on('clientServerScriptsUpdate', function(data){
+        scriptsShop.serverScripts = data.serverScripts
+        io.sockets.emit('serverScriptsUpdate', {serverScripts: scriptsShop.serverScripts})
     })
 })

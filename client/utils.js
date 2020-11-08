@@ -1,4 +1,43 @@
 // functions
+
+/**
+ * @param {String} script Script
+ */
+function getScriptTitle(script){
+    let i = script.indexOf("//")
+    return script.substring(i+2, script.indexOf("\n", i)).trim()
+}
+
+/**
+ * @param {String} script Script
+ */
+function getScriptDescription(script){
+    let i = script.indexOf("//", script.indexOf("//")+2)
+    return script.substring(i+2, script.indexOf("\n", i)).trim()
+}
+
+/**
+ * @param {String} s Script
+ * @param {String} i Id in list
+ */
+function getScriptShopItem(s, i, globalCategory=true){
+    let com1 = s.indexOf("//")
+        let nl1 = s.indexOf("\n", com1)
+        let title = getScriptTitle(s)
+        let description = ""
+        if(s.charAt(nl1+1) == "/") {
+            description = getScriptDescription(s)
+        }
+        console.log(globalCategory)
+
+        return `
+<div class="item">
+    <div class="title">`+title+`</div>
+    <div class="description">`+description+`</div>
+    <div onclick="loadScriptFromShop(`+i+`, `+(globalCategory.toString())+`)" class="load-button button">load</div>
+</div>`
+}
+
 function getPlayerIdByUid(uid){
     return players.findIndex(x => x.uid == uid)
 }

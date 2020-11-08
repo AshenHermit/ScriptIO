@@ -13,7 +13,7 @@ function updateScriptsList(){
         }
 
         return `<div onClick="onScriptSelect(`+i+`)" data-script-id="`+i+`" class="item button `+(selectedScriptId==i ? "active" : "")+` `+(disabled ? "disabled" : "")+`">`+ 
-            s.substring(s.indexOf("//")+"//".length, s.indexOf("\n", s.indexOf("//"))).replaceAll(" ", "")
+            getScriptTitle(s)
         +`</div>`
     }).join("\n")
 }
@@ -107,21 +107,39 @@ function download(content, fileName, contentType) {
     a.click();
 }
 
+function updateServerScriptsList(){
+    serverScriptsShopList.innerHTML = 
+    scriptsShop.serverScripts.map((s, i) => getScriptShopItem(s, i, false)).join("")
+}
 
 
 var contextMenu = document.getElementById("context_menu")
 contextMenu.style.display = "none"
 
 var ctxMenuTarget = null
+var scriptId
 
 function setCtxMenuState(state){
     contextMenu.style.display = state ? "" : "none"
 }
 
 function ctxMenuFunction(e){
+
+    // upload to server shop
+    if(e.target.innerText == "upload to server shop"){
+        let title = getScriptTitle(localScripts[scriptId])
+        let id = scriptsShop.serverScripts.findIndex(x => (getScriptTitle(x) == title))
+        if(id == -1){
+            scriptsShop.serverScripts.push(localScripts[scriptId])
+        }else{
+            scriptsShop.serverScripts[id] = localScripts[scriptId]
+        }
+        socket.emit('clientServerScriptsUpdate', {serverScripts: scriptsShop.serverScripts})
+        setCtxMenuState(false)
+    }
+
     // disabling / enabling
-    if(e.target.innerText == "disable/enable"){
-        scriptId = parseInt(ctxMenuTarget.getAttribute("data-script-id"))
+    else if(e.target.innerText == "disable/enable"){
         var s = localScripts[scriptId]
         let disIdx = s.indexOf("this.disabled")
         if(disIdx != -1 && (s.charAt(disIdx-1) == "\n" || disIdx==0)){
@@ -141,7 +159,6 @@ function ctxMenuFunction(e){
 
     // moving
     }else if(e.target.innerText == "move up" || e.target.innerText == "move down"){
-        scriptId = parseInt(ctxMenuTarget.getAttribute("data-script-id"))
         let dir = (e.target.innerText == "move down" ? 1 : -1)
         if(!(dir == -1 && scriptId==0) && !(dir == 1 && scriptId>=localScripts.length-1)){
             var b = localScripts[scriptId];
@@ -149,14 +166,15 @@ function ctxMenuFunction(e){
             localScripts[scriptId+dir] = b;
             if(selectedScriptId == scriptId) selectedScriptId+=dir
             else if(selectedScriptId == scriptId+dir) selectedScriptId-=dir
+            scriptId += dir
             updateScriptsList()
         }
-        setCtxMenuState(false)
+        //setCtxMenuState(false)
 
     // deleting
     }else if(e.target.innerText == "delete"){
-        scriptId = parseInt(ctxMenuTarget.getAttribute("data-script-id"))
-        let canDelete = confirm('delete script "' + ctxMenuTarget.innerText + '" ?');
+        //let canDelete = confirm('delete script "' + ctxMenuTarget.innerText + '" ?');
+        let canDelete = true;
         if(canDelete){
             localScripts.splice(scriptId, 1)
             if(selectedScriptId == scriptId){
@@ -182,6 +200,7 @@ document.addEventListener('contextmenu', function(e) {
         contextMenu.style.top  = e.pageY+"px"
         setCtxMenuState(true)
         ctxMenuTarget = e.target
+        scriptId = parseInt(ctxMenuTarget.getAttribute("data-script-id"))
     }else if(e.target == contextMenu || e.target.parentNode==contextMenu){
         e.preventDefault()
     }
@@ -220,9 +239,28 @@ window.addEventListener("drop",function(e){
 
 // scripts shop
 
-function loadScriptFromShop(id){
-    localScripts.push(scriptsShop.scripts[id])
+function loadScriptFromShop(id, globalCategory){
+    if(globalCategory)
+        localScripts.push(scriptsShop.scripts[id])
+    else
+        localScripts.push(scriptsShop.serverScripts[id])
     selectedScriptId = localScripts.length-1
     editor.setValue(localScripts[selectedScriptId])
     updateScriptsList()
 }
+
+function toggleCollection(e){
+    if(e.innerText == "collection: global"){
+        e.innerHTML = "collection: server"
+
+        scriptsShopList.style.display = "none"
+        serverScriptsShopList.style.display = ""
+    }else{
+        e.innerHTML = "collection: global"
+
+        scriptsShopList.style.display = ""
+        serverScriptsShopList.style.display = "none"
+    }
+}
+
+//TODO: move up move down without closing context menu

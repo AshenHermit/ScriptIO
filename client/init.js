@@ -23,6 +23,7 @@ gCanvas.height = window.innerHeight
 var gCtx = gCanvas.getContext("2d")
 
 var scriptsShopList = document.getElementById("scripts_shop_list")
+var serverScriptsShopList = document.getElementById("server_scripts_shop_list")
 
 var scriptsShop = {}
 var localScripts = []

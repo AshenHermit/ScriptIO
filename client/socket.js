@@ -15,24 +15,10 @@ socket.on('local_connect', function (data) {
     scriptsShop = data.scriptsShop
     
     scriptsShopList.innerHTML = 
-    scriptsShop.scripts.map((s, i)=>{
+    scriptsShop.scripts.map((s, i) => getScriptShopItem(s, i, true)).join("")
 
-        let com1 = s.indexOf("//")
-        let nl1 = s.indexOf("\n", com1)
-        let title = s.substring(com1+2, nl1).trim()
-        let description = ""
-        if(s.charAt(nl1+1) == "/") {
-            description = s.substring(nl1+3, s.indexOf("\n", nl1+1)).trim()
-        }
-
-        return `
-<div class="item">
-    <div class="title">`+title+`</div>
-    <div class="description">`+description+`</div>
-    <div onclick="loadScriptFromShop(`+i+`)" class="load-button button">load</div>
-</div>`
-        
-    }).join("")
+    serverScriptsShopList.innerHTML = 
+    scriptsShop.serverScripts.map((s, i) => getScriptShopItem(s, i, false)).join("")
 
     buildMap(data.map)
 });
@@ -83,4 +69,9 @@ socket.on('serverClientSetupScripts', function (data) {
 socket.on('serverLoadMap', function (data) {
     console.log(data)
     buildMap(data.map)
+});
+
+socket.on('serverScriptsUpdate', function (data) {
+    scriptsShop.serverScripts = data.serverScripts
+    updateServerScriptsList()
 });

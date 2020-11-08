@@ -26,7 +26,7 @@
                 <div onclick="onEditorShow()" class="title button">Editor</div>
                 <div onclick="onAddScript()" class="add button">+</div>
                 <div onclick="onApplyScripts()" class="item button">apply</div>
-                <div onclick="onDeployScripts()" class="item button">deploy</div>
+                <div onclick="onDeployScripts()" class="item button">emit</div>
             </div>
             <div id="scripts_list" style="display: none;">
             </div>
@@ -35,12 +35,13 @@
 
         <div class="scripts-shop" id="scripts_shop" style="display: none;">
             <div class="title">Scripts Shop</div>
+            <div class="category button" onclick="toggleCollection(this)">collection: global</div>
+
             <div id="scripts_shop_list" class="scripts-shop-list">
-                <!-- <div class="item">
-                    <div class="title">Title</div>
-                    <div class="description">Description</div>
-                    <div class="load-button">load</div>
-                </div> -->
+                
+            </div>
+            <div style="display: none;" id="server_scripts_shop_list" class="scripts-shop-list">
+                
             </div>
         </div>
     </div>
@@ -48,6 +49,7 @@
     <div id="fps_text" class="fps-text"></div>
 
     <div class="context-menu" id="context_menu">
+        <div class="item button">upload to server shop</div>
         <div class="item button">disable/enable</div>
         <div class="item button">move up</div>
         <div class="item button">move down</div>
