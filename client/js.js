@@ -213,7 +213,7 @@ function update(){
     cameraShakeVector.x += (cameraShakeTargetVector.x-cameraShakeVector.x)/5
     cameraShakeVector.y += (cameraShakeTargetVector.y-cameraShakeVector.y)/5 
     cameraPos._add(cameraShakeVector)
-    cameraShakeAmount = Math.max(cameraShakeAmount-2, 0)
+    cameraShakeAmount = Math.max(cameraShakeAmount/1.1, 1)-1
 
 
     //draw

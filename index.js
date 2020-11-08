@@ -12,6 +12,9 @@ var Dropbox = require('dropbox').Dropbox;
 var scriptsShop = {}
 var gameMap = {}
 
+var date = new Date()
+date = date.getDate() + "_" + date.getMonth() + "_" + date.getFullYear() + "-" + date.getHours() + "-" + date.getMinutes() + "-" + date.getSeconds()
+
 function parseMap(file){
     gameMap.colliders = []
 
@@ -120,6 +123,18 @@ function generateToken(){
     return out
 }
 
+function saveServerScripts(){
+    let dir = "./server_scripts_saves/"
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, {
+            recursive: true
+        });
+    }
+    fs.writeFile("./server_scripts_saves/"+date+".json", JSON.stringify({serverScripts: scriptsShop.serverScripts}), { flag: 'w' }, function (err) {
+        if(err) throw err
+    })
+}
+
 // objects
 function Player(data){
     this.uid = data.uid
@@ -202,6 +217,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('clientServerScriptsUpdate', function(data){
         scriptsShop.serverScripts = data.serverScripts
+        saveServerScripts()
         io.sockets.emit('serverScriptsUpdate', {serverScripts: scriptsShop.serverScripts})
     })
 })

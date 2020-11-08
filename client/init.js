@@ -62,4 +62,4 @@ var gameMap = {
 }
 
 //map 
-gameMap.colliders.push(new Collider(-512, 32, 1024, 32))
+//gameMap.colliders.push(new Collider(-512, 32, 1024, 32))

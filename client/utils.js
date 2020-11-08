@@ -32,9 +32,10 @@ function getScriptShopItem(s, i, globalCategory=true){
 
         return `
 <div class="item">
+    `+(!globalCategory ? ('<div onclick="deleteScriptFromServerScripts('+i+')" class="delete button"></div>') : '')+`
     <div class="title">`+title+`</div>
     <div class="description">`+description+`</div>
-    <div onclick="loadScriptFromShop(`+i+`, `+(globalCategory.toString())+`)" class="load-button button">load</div>
+    <div onclick="loadScriptFromShop(`+i+`, `+globalCategory+`)" class="load-button button">load</div>
 </div>`
 }
 
@@ -71,6 +72,7 @@ function createImage(src){
     img.onload = function(e){
         this.isLoaded = true
     }
+    img.computedHeight = 1
     img.src = src
     return img
 }
@@ -88,8 +90,8 @@ function drawImage(ctx, img, x, y, width, angle=0){
     if(img.isLoaded){
         addTransform(1,0,0,1,x,y); // set position of image center
         ctx.rotate(angle); // rotate
-        var height = (img.height/img.width)*width
-        ctx.drawImage(img,-width/2,-height/2, width, height);
+        img.computedHeight = (img.height/img.width)*width
+        ctx.drawImage(img,-width/2,-img.computedHeight/2, width, img.computedHeight);
         restoreTransform()
     }
 }
@@ -107,8 +109,8 @@ function drawImagePlus(ctx, img, x, y, width, angle=0, ox=0, oy=0, mirrorX=false
         addTransform(1,0,0,1,x,y); // set position of image center
         ctx.rotate(angle); // rotate
         ctx.scale((mirrorX ? -1 : 1), (mirrorY ? -1 : 1))
-        var height = (img.height/img.width)*width
-        ctx.drawImage(img,-width/2*(mirrorX ? -1 : 1)+ox,-height/2*(mirrorY ? -1 : 1)+oy, width*(mirrorX ? -1 : 1), height*(mirrorY ? -1 : 1));
+        img.computedHeight = (img.height/img.width)*width
+        ctx.drawImage(img,-width/2*(mirrorX ? -1 : 1)+ox,-img.computedHeight/2*(mirrorY ? -1 : 1)+oy, width*(mirrorX ? -1 : 1), img.computedHeight*(mirrorY ? -1 : 1));
         //ctx.setTransform(1,0,0,1,0,0); // restore default transform
         restoreTransform()
     }

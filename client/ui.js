@@ -206,6 +206,10 @@ document.addEventListener('contextmenu', function(e) {
     }
 }, false);
 
+gCanvas.addEventListener('contextmenu', function(e) {
+    e.preventDefault()
+}, false);
+
 document.addEventListener('click', function(e) {
     if(e.target!=contextMenu && e.target.parentNode!=contextMenu){
         setCtxMenuState(false)
@@ -263,4 +267,7 @@ function toggleCollection(e){
     }
 }
 
-//TODO: move up move down without closing context menu
+function deleteScriptFromServerScripts(i){
+    scriptsShop.serverScripts.splice(i, 1)
+    socket.emit('clientServerScriptsUpdate', {serverScripts: scriptsShop.serverScripts})
+}

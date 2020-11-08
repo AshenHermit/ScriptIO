@@ -192,6 +192,12 @@ padding-right: 14px;
     background-color: #3b3b3b;
 }
 
+.scripts-shop-list{
+    height: 640px;
+    overflow-y: auto;
+    margin-top: 8px;
+}
+
 .scripts-shop-list .item .title {
     font-size: 1.1em;
     font-weight: normal;
@@ -218,6 +224,16 @@ padding-right: 14px;
 .scripts-shop-list .item .description {
     font-size: 0.8em;
     color: #777;
+}
+
+.scripts-shop-list .item .delete {
+    background-color: #ce4153;
+    width: 8px;
+    height: 8px;
+    margin-top: -8px;
+    position: relative;
+    margin-left: 100%;
+    border-radius: 2px;
 }
 
 .fps-text {
