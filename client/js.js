@@ -234,12 +234,16 @@ function update(){
     delta = (Date.now() - lastCalledTime)/1000
     lastCalledTime = Date.now()
     fps = 1/delta
+
+    window.requestAnimationFrame(update);
 }
 function syncronize(){
     if(connected) socket.emit('clientSync', {token: localPlayer.token, hp: localPlayer.hp, mousePos: localPlayer.mousePos, position: localPlayer.position});
     fpsText.innerHTML = Math.round(fps)
 }
 
-updateInterval = setInterval(update, 1000/60)
+window.requestAnimationFrame(update);
+
+//updateInterval = setInterval(update, 1000/60)
 syncInterval = setInterval(syncronize, 1000/18)
 
