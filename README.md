@@ -1,4 +1,4 @@
-# ScriptIO v0.3
+# ScriptIO v0.30
 
 Its multiplayer app where you can add scripts, edit, run and share them in runtime.  
 At start you have just one player rect you can control, that synchronizes his position among other players. By writing scripts you can write your own behaviors and graphics on top of your player.
@@ -20,4 +20,4 @@ To write map file with it, you need:
 ![blender_screenshot](https://sun9-18.userapi.com/KOzpzaJ98mJe9YVhTqINEHzTmvzkQCSiibDkEQ/yRZaWfP51KQ.jpg)
 * Choose *Map Export Path* in the *Scene Properties* and press export button.
 
-To load map in game you need use this function in browser console: `loadMap("mapname")`
+To load map in game you need use this function in browser console: `loadMap("map name")`
