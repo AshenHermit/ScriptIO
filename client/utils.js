@@ -54,10 +54,13 @@ function addToInventory(objectProto, arrayName, name, image, creationFunction=nu
         proto: objectProto,
         arrayName: arrayName,
         scriptCtx: currentScriptCtx,
-        create: creationFunction || function(){
+        create: function(){
             let obj = new objectProto()
             if(obj.position)
                 obj.position._set(currentScriptPlayer.mousePos)
+
+            if(creationFunction) creationFunction(obj)
+            
             this.scriptCtx[arrayName].push(obj)
         }
     })

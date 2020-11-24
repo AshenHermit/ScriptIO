@@ -262,6 +262,7 @@ padding-right: 14px;
 .inventory {
     position: absolute;
     bottom: 0;
+    user-select: none;
 }
 
 .inventory .title {
@@ -276,9 +277,9 @@ padding-right: 14px;
 }
 
 .inventory .objects-list {
-    margin-bottom: 10px;
-    margin-left: 10px;
     overflow-x: auto;
+    background-color: #2d2d2d;
+    padding: 10px;
 }
 
 .selected-inventory-item{
@@ -287,15 +288,20 @@ padding-right: 14px;
 
 .inventory .item .image {
     width: 50px;
-    padding: 0.4em;
+    display: inherit;
+    margin-bottom: 0.4em;
 }
 
 .inventory .item .name {
     color: #969696;
     margin-bottom: 0.4em;
+    width: inherit;
+    display: block;
 }
 
 .inventory .item {
     text-align: center;
     display: inline-block;
+    max-width: 120px;
+    padding: 0.4em;
 }
