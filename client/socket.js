@@ -75,3 +75,16 @@ socket.on('serverScriptsUpdate', function (data) {
     scriptsShop.serverScripts = data.serverScripts
     updateServerScriptsList()
 });
+
+socket.on('serverClientObjectPickUp', function(data){
+    if(data.uid!=localPlayer.uid){
+        playerByUid[data.uid].itemInHands = playerByUid[data.uid].scriptCtx[data.scriptCtxId][data.arrayName][data.objId]
+    }
+})
+
+socket.on('serverSelectInventoryItem', function (data) {
+    if(data.uid!=localPlayer.uid)
+        playerByUid[data.uid].selectedItem = playerByUid[data.uid].inventory[data.itemId]
+
+    updateServerScriptsList()
+});

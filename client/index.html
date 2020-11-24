@@ -19,6 +19,14 @@
             <button>Play</button>
         </div>
     </div>
+
+    <div class="inventory">
+        <div class="title button" onclick="onInventoryTitleClick()">inventory</div>
+        <div class="objects-list" id="inventory_list">
+            <div class="item"></div>
+        </div>
+    </div>
+
     <div id="edit_panel" class="edit-panel">
         <div id="file_drop_area" class="drop-file" style="display: none;">drop json data</div>
         <div class="explorer">
@@ -56,7 +64,8 @@
         <div class="item button">delete</div>
     </div>
 
-    <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"></script>
+    <script src="https://ajaxorg.github.io/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
     <!-- <script src="box2d_utils.js"></script> -->
 
     <script src="objects.js"></script>

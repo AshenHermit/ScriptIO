@@ -47,6 +47,47 @@ function cameraShake(amount){
     cameraShakeAmount += amount
 }
 
+function addToInventory(objectProto, arrayName, name, image, creationFunction=null){
+    currentScriptPlayer.inventory.push({
+        name: name,
+        image: image,
+        proto: objectProto,
+        arrayName: arrayName,
+        scriptCtx: currentScriptCtx,
+        create: creationFunction || function(){
+            let obj = new objectProto()
+            if(obj.position)
+                obj.position._set(currentScriptPlayer.mousePos)
+            this.scriptCtx[arrayName].push(obj)
+        }
+    })
+}
+
+// pick up
+function getObjectIdOnPosition(array, pos){
+    for(var i=0; i<array.length; i++){
+        if(array[i].width){
+            if(pos.x > array[i].position.x + array[i].origin.x - array[i].width/2
+            && pos.x < array[i].position.x + array[i].origin.x + array[i].width/2
+            && pos.y > array[i].position.y + array[i].origin.y - array[i].image.computedHeight/2
+            && pos.y < array[i].position.y + array[i].origin.y + array[i].image.computedHeight/2){
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+function pickUpObjectInArray(arrayName){
+    if(currentScriptPlayer.token){
+        let id = getObjectIdOnPosition(currentScriptCtx[arrayName], currentScriptPlayer.mousePos)
+        if(id != -1){
+            currentScriptPlayer.itemInHands = currentScriptCtx[arrayName][id];
+            socket.emit('clientObjectPickUp', {token: currentScriptPlayer.token, objId: id, arrayName: arrayName, scriptCtxId: currentScriptCtx._id})
+        }
+    }
+}
+
 function restoreTransform(){
     gCtx.setTransform(
         ctxTransform[0],
@@ -75,6 +116,36 @@ function createImage(src){
     img.computedHeight = 1
     img.src = src
     return img
+}
+
+function updateArray(array, player){
+    for(var i=0; i<array.length; i++){
+        if(array[i].update){
+            array[i].update(player);
+        }
+    }
+}
+function destroyArray(array, player){
+    for(var i=0; i<array.length; i++){
+        if(array[i].destroy){
+            array[i].destroy(player);
+        }
+    }
+}
+function drawArray(array, ctx, player){
+    if(player){
+        for(var i=0; i<array.length; i++){
+            if(array[i].draw){
+                array[i].draw(ctx, player);
+            }
+        }
+    }else{
+        for(var i=0; i<array.length; i++){
+            if(array[i].draw){
+                array[i].draw(ctx);
+            }
+        }
+    }
 }
 
 function drawLine(ctx, color, width, fromX, fromY, toX, toY){
@@ -207,13 +278,14 @@ function physicsStep(position, velocity, margin){
     point = lineMapIntersect(position, p2y, true)
     if(point){
         // y
-        if(position.y < point.y)
+        if(position.y < point.y){
             position.y = point.y-margin
-        else
+            isOnFloor = true
+        }else{
             position.y = point.y+margin
+        }
 
         velocity.y = 0
-        isOnFloor = true
     }
     position.y+=velocity.y
     position.x-=velocity.x*1
@@ -241,7 +313,10 @@ function loadMap(mapName){
 }
 
 function destroyCollider(col){
-    gameMap.colliders.splice(gameMap.colliders.findIndex(x=>x.uid==col.uid), 1)
+    if(col.uid){
+        gameMap.colliders.splice(gameMap.colliders.findIndex(x=>x.uid==col.uid), 1)
+        col.uid = null
+    }
 }
 
 function createCollider(col){

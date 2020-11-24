@@ -3,9 +3,6 @@ function ScriptContext(script, player, i){
     this._id = i
     this._script = script
     eval(this._script)
-    if(this.init && !this.disabled){
-        this.init(player)
-    }
 }
 
 function Player(data){
@@ -40,6 +37,9 @@ function Player(data){
     this.overrideDraw = false
     this.overrideCameraMotion = false
 
+    this.inventory = []
+    this.selectedItem = null
+
     this.isLocal = function(){
         return this.token !== undefined
     }
@@ -47,25 +47,43 @@ function Player(data){
     this.setupScripts = function(scripts){
         this.rng = new RNG(new Date().getMinutes()+this.uid)
 
+        inventoryList.innerHTML = ""
+        this.inventory = []
+        this.selectedItem = null
+
         for(var i=0; i<this.scriptCtx.length; i++){
             if(this.scriptCtx[i].destroy && !this.scriptCtx[i].disabled){
                 this.scriptCtx[i].destroy(this)
             }
         }
         this.scriptCtx = []
+        currentScriptPlayer = this
         for(var i=0; i<scripts.length; i++){
             this.scriptCtx.push(new ScriptContext(scripts[i], this, i))
+
+            currentScriptCtx = this.scriptCtx[i]
+                
+            if(this.scriptCtx[i].init && !this.scriptCtx[i].disabled){
+                this.scriptCtx[i].init(this)
+            }
         }
+
+        updateInventoryList()
     }
     this.emitScripts = function(){
         socket.emit('clientSetupScripts', {token: this.token, scripts: this.scriptCtx.map(x=>x._script)});
     }
 
     this.update = function(){
+        currentScriptPlayer = this
+
+        if(this.onPress["KeyR"] && this.selectedItem){
+            this.selectedItem.create()
+        }
+
         if(this.token){ // is local player
             this.mousePos.x = cameraPos.x + clientMousePos.x - gCanvas.width/2
             this.mousePos.y = cameraPos.y + clientMousePos.y - gCanvas.height/2
-
 
             if(editorState){
                 let centerPanelEnd = editPanel.clientWidth-gCanvas.width/2
@@ -103,6 +121,7 @@ function Player(data){
         for(var i=0; i<this.scriptCtx.length; i++){
             if(this.scriptCtx[i].update && !this.scriptCtx[i].disabled) {
                 try{
+                    currentScriptCtx = this.scriptCtx[i]
                     this.scriptCtx[i].update(this)
                 }catch(err){
                     console.error(err)
@@ -116,6 +135,7 @@ function Player(data){
     }
 
     this.draw = function(ctx){
+        currentScriptPlayer = this
         if(!this.overrideDraw){
             ctx.fillStyle = "#fff"
             ctx.fillRect(this.position.x - 4, this.position.y - 4, 8, 8)

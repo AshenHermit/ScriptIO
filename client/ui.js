@@ -43,6 +43,9 @@ function onApplyScripts(){
 }
 
 function onDeployScripts(){
+    updateScript()
+    updateScriptsList()
+    localPlayer.setupScripts(localScripts)
     localPlayer.emitScripts()
 }
 
@@ -60,8 +63,17 @@ function loadJsonData(files){
     if(files.length>0){
         files[0].text().then(function(data){
             var data = JSON.parse(data)
-            localScripts = data.scripts
-            if(localScripts.length>0) onScriptSelect(0, true)
+            console.log();
+
+            if(data.scripts){
+                localScripts = data.scripts
+                if(localScripts.length>0) onScriptSelect(0, true)
+            }
+
+            if(data.serverScripts){
+                scriptsShop.serverScripts = data.serverScripts
+                updateServerScriptsList()
+            }
         })
     }
 }
@@ -270,4 +282,28 @@ function toggleCollection(e){
 function deleteScriptFromServerScripts(i){
     scriptsShop.serverScripts.splice(i, 1)
     socket.emit('clientServerScriptsUpdate', {serverScripts: scriptsShop.serverScripts})
+}
+
+// inventory
+
+function inventoryItemSelect(el, id){
+    localPlayer.selectedItem = localPlayer.inventory[id]
+    let selectedEl = document.getElementsByClassName("selected-inventory-item")[0]
+    if(selectedEl)
+        selectedEl.classList.remove("selected-inventory-item");
+    el.classList.add("selected-inventory-item")
+
+    socket.emit('clientSelectInventoryItem', {token: localPlayer.token, itemId: id});
+}
+
+function updateInventoryList(){
+    inventoryList.innerHTML = localPlayer.inventory.map((item, id)=>`
+<div class="item button" onclick="inventoryItemSelect(this, `+id+`)">
+<div class="image"><img src="`+ item.image.src +`"/></div>
+<div class="name">`+ item.name +`</div>
+</div>`).join("")   
+}
+
+function onInventoryTitleClick(){
+    inventoryList.style.display = inventoryList.style.display=="none" ? "" : "none"
 }

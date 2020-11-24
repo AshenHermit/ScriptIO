@@ -91,3 +91,18 @@ function Collider(x1, y1, x2, y2){
         ctx.stroke();
     }
 }
+
+class Drawable{
+    constructor(){
+        this.image = null;
+        this.position = vector2(0, 0);
+        this.origin = vector2(0, 0);
+        this.width = 32;
+        this.angle = 0;
+    }
+    draw(ctx){
+        if(this.image){
+            drawImage(ctx, this.image, this.position.x, this.position.y, this.width, this.angle);
+        }
+    }
+}

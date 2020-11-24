@@ -1,6 +1,88 @@
+ace.require("ace/ext/language_tools");
 var editor = ace.edit("editor");
 editor.setTheme("ace/theme/monokai");
 editor.session.setMode("ace/mode/javascript");
+var langTools = ace.require("ace/ext/language_tools");
+var snippetManager = ace.require("ace/snippets").snippetManager;
+
+
+//completers
+function functionToSnippet(func){
+    let text = func.toString()
+    text = text.substring(text.indexOf("function ")+"function ".length, text.indexOf(")")+1)
+    let name = text.substring(0, text.indexOf("(")).trim()
+    let arguments = text.substring(text.indexOf("("), text.indexOf(")")+1).trim()
+    let snippet = text
+
+    let snippetArgs = []
+
+    arguments
+    .replaceAll(" ", "")
+    .replaceAll("(", "")
+    .replaceAll(")", "")
+    .split(",")
+    .forEach((arg)=>{
+        snippetArgs.push("${" + (snippetArgs.length+1) + ":" + arg.split("=")[0] + "}")
+    })
+
+    return {
+        name: text,
+        caption: name,
+        snippet: name + "(" + snippetArgs.join(", ") + ")",
+        meta: arguments
+    }
+}
+
+var functions = [
+    drawImage,
+    drawImagePlus,
+    drawWithTransform,
+
+    updateArray,
+    drawArray,
+    destroyArray,
+
+    lineLineIntersect,
+    lineColliderIntersect,
+    lineMapIntersect,
+    physicsStep,
+
+    createCollider,
+    destroyCollider,
+
+    cameraShake,
+    getObjectIdOnPosition,
+    pickUpObjectInArray,
+    createImage,
+
+    drawLine,
+
+    restoreTransform,
+    addTransform,
+
+    addToInventory,
+]
+
+var completer = {
+    getCompletions: function(editor, session, pos, prefix, callback) {
+        var completions = functions.map(functionToSnippet);
+        completions.push({
+            name: "random",
+            caption: "random",
+            snippet: "player.random()",
+            meta: "player.random()"
+        })
+        callback(null, completions);
+    }
+}
+langTools.setCompleters([completer]);
+
+editor.setOptions({
+	enableBasicAutocompletion: true,
+	enableSnippets: true    
+});
+
+//
 
 
 var testScript = `
@@ -60,6 +142,13 @@ var gameMap = {
     bgImage: null,
     colliders: []
 }
+
+var inventoryList = document.getElementById("inventory_list")
+var inventory = []
+var selectedItem = null
+
+var currentScriptCtx = null
+var currentScriptPlayer = null
 
 //map 
 //gameMap.colliders.push(new Collider(-512, 32, 1024, 32))

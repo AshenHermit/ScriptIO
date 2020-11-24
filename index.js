@@ -220,4 +220,16 @@ io.sockets.on('connection', function (socket) {
         saveServerScripts()
         io.sockets.emit('serverScriptsUpdate', {serverScripts: scriptsShop.serverScripts})
     })
+
+    socket.on('clientObjectPickUp', function(data){
+        data.uid = playerByToken[data.token].uid
+        delete data.token
+        io.sockets.emit('serverClientObjectPickUp', data);
+    })
+
+    socket.on('clientSelectInventoryItem', function(data){
+        data.uid = playerByToken[data.token].uid
+        delete data.token
+        io.sockets.emit('serverSelectInventoryItem', data);
+    })
 })
