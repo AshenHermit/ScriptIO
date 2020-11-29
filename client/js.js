@@ -189,28 +189,32 @@ document.addEventListener('keyup', function(e){
     }
 })
 
-function mouseEvent(e, state){
+function mouseEvent(e, state, isTouch=false){
     let code = "MouseM"
-    if(e.button == 0)
+    if(isTouch){
         code = "MouseL"
-    else if(e.button == 2)
-        code = "MouseR"
+    }else{
+        if(e.button == 0)
+            code = "MouseL"
+        else if(e.button == 2)
+            code = "MouseR"
+    }
 
     localPlayer.onPress[code] = state
     localPlayer.isPressed[code] = state
     if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: code, state: state})
 }
 
-function onMouseDown(e){
+function onMouseDown(e, isTouch=false){
     if(connected) socket.emit('clientSync', {token: localPlayer.token, hp: localPlayer.hp, mousePos: localPlayer.mousePos, position: localPlayer.position});
-    mouseEvent(e, true)
+    mouseEvent(e, true, isTouch)
 }
 
-function onMouseUp(e){
-    mouseEvent(e, false)
+function onMouseUp(e, isTouch=false){
+    mouseEvent(e, false, isTouch)
 }
 
-function onMouseMove(e){
+function onMouseMove(e, isTouch=false){
     clientMousePos.x = e.clientX
     clientMousePos.y = e.clientY
 }
@@ -231,19 +235,19 @@ gCanvas.addEventListener('mousemove', function(e){
 
 gCanvas.addEventListener("touchstart", function(e){
     if(e.changedTouches[0])
-        onMouseDown(e.changedTouches[0])
+        onMouseDown(e.changedTouches[0], true)
 });
 gCanvas.addEventListener("touchend", function(e){
     if(e.changedTouches[0])
-        onMouseUp(e.changedTouches[0])
+        onMouseUp(e.changedTouches[0], true)
 });
 gCanvas.addEventListener("touchcancel",function(e){
     if(e.changedTouches[0])
-        onMouseUp(e.changedTouches[0])
+        onMouseUp(e.changedTouches[0], true)
 });
 gCanvas.addEventListener("touchmove", function(e){
     if(e.changedTouches[0])
-        onMouseMove(e.changedTouches[0])
+        onMouseMove(e.changedTouches[0], true)
 });
 
 
