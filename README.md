@@ -10,6 +10,10 @@ At start you have just one player rect you can control, that synchronizes his po
 node index.js <ip>
 ```
 
+## Web application
+I hosted this app on *Heroku* with free plan and of course his ping is higher than on the local server.  
+Here is it: https://script-io.herokuapp.com/
+
 ## Editing maps
 This app can parse map files whose content is just a list of colliders, so far.  
 As a map editor I use *Blender* with my own exporter, you can download it from [here](https://drive.google.com/file/d/17z1lCW57oHxwiDmuP5jRW4_obvUO6ykc/view?usp=sharing).  

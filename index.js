@@ -134,7 +134,7 @@ function saveServerScripts(destination='local'){
     
         dbx.filesUpload({
             "path": "/server_scripts_saves/"+ date +".json",
-            "contents": JSON.stringify(dbCopy, 0, 4),
+            "contents": JSON.stringify({serverScripts: scriptsShop.serverScripts}, 0, 4),
             "mode": {".tag": "overwrite"},
             "autorename": false,
             "mute": true,
@@ -143,7 +143,7 @@ function saveServerScripts(destination='local'){
             
         })
         .catch(function(err){
-            console.error(err)
+            console.log(err)
             
         })
     }
