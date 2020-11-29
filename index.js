@@ -98,7 +98,7 @@ var ip = "0.0.0.0"
 
 if(process.argv.length>2) ip = process.argv[2]
 
-server.listen(3000, ip);  //listen on port 3000
+server.listen(process.env.PORT || 3000, ip);  //listen on port 3000
 console.log("created server: "+ip+":3000");
 
 app.use(function(req, res, next) {
