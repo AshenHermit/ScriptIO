@@ -229,19 +229,19 @@ gCanvas.addEventListener('mousemove', function(e){
 
 
 
-el.addEventListener("touchstart", function(e){
+gCanvas.addEventListener("touchstart", function(e){
     if(e.changedTouches[0])
         onMouseDown(e.changedTouches[0])
 });
-el.addEventListener("touchend", function(e){
+gCanvas.addEventListener("touchend", function(e){
     if(e.changedTouches[0])
         onMouseUp(e.changedTouches[0])
 });
-el.addEventListener("touchcancel",function(e){
+gCanvas.addEventListener("touchcancel",function(e){
     if(e.changedTouches[0])
         onMouseUp(e.changedTouches[0])
 });
-el.addEventListener("touchmove", function(e){
+gCanvas.addEventListener("touchmove", function(e){
     if(e.changedTouches[0])
         onMouseMove(e.changedTouches[0])
 });
