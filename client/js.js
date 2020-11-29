@@ -160,13 +160,17 @@ function Player(data){
 
 // listeners
 // disconnection
-window.addEventListener("beforeunload", function(e){
+
+
+window.onbeforeunload = function(e){
     connected = false
     socket.emit('clientDisconnect', {token: localPlayer.token});
 
     clearInterval(updateInterval)
     clearInterval(syncInterval)
-}, false);
+
+    return 'Are you really want to disconnect?';
+}
 
 document.addEventListener('keydown', function(e){
     //if(localPlayer.isPressed[e.code] !== undefined && document.activeElement == document.body){

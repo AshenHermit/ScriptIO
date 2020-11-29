@@ -5,7 +5,6 @@ var express = require('express'),
 var socket = require('socket.io');
 var fs = require('fs');
 
-
 var fetch = require('isomorphic-fetch');
 var Dropbox = require('dropbox').Dropbox;
 
@@ -123,16 +122,44 @@ function generateToken(){
     return out
 }
 
-function saveServerScripts(){
-    let dir = "./server_scripts_saves/"
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, {
-            recursive: true
+
+
+function saveServerScripts(destination='local'){
+    //if(destination == 'dropbox'){
+    if(process.env.DBX_ACCESS_TOKEN){
+        var dbx = new Dropbox({
+            accessToken:  process.env.DBX_ACCESS_TOKEN, 
+            fetch: fetch
         });
+    
+        dbx.filesUpload({
+            "path": "/server_scripts_saves/"+ date +".json",
+            "contents": JSON.stringify(dbCopy, 0, 4),
+            "mode": {".tag": "overwrite"},
+            "autorename": false,
+            "mute": true,
+            "strict_conflict": false
+        }).then(function(req){
+            
+        })
+        .catch(function(err){
+            console.error(err)
+            
+        })
     }
-    fs.writeFile("./server_scripts_saves/"+date+".json", JSON.stringify({serverScripts: scriptsShop.serverScripts}), { flag: 'w' }, function (err) {
-        if(err) throw err
-    })
+    //else if(destination == 'local'){
+    else{
+        let dir = "./server_scripts_saves/"
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, {
+                recursive: true
+            });
+        }
+        fs.writeFile("./server_scripts_saves/"+date+".json", JSON.stringify({serverScripts: scriptsShop.serverScripts}), { flag: 'w' }, function (err) {
+            if(err) throw err
+        })
+    }
+
 }
 
 // objects
