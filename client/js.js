@@ -168,8 +168,6 @@ window.onbeforeunload = function(e){
 
     clearInterval(updateInterval)
     clearInterval(syncInterval)
-
-    return 'Are you really want to disconnect?';
 }
 
 document.addEventListener('keydown', function(e){

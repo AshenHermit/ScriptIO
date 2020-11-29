@@ -12,7 +12,7 @@ node index.js <ip>
 
 ## Web application
 I hosted this app on *Heroku* with free plan and of course his ping is higher than on the local server.  
-Here is it: https://script-io.herokuapp.com/
+Here it is: https://script-io.herokuapp.com/
 
 ## Editing maps
 This app can parse map files whose content is just a list of colliders, so far.  
@@ -25,3 +25,4 @@ To write map file with it, you need:
 * Choose *Map Export Path* in the *Scene Properties* and press export button.
 
 To load map in game you need use this function in browser console: `loadMap("map name")`
+
