@@ -86,7 +86,7 @@ fs.readFile('./scriptsShop.json', 'utf8', function (err,data) {
     console.log("scripts shop loaded")
 });
 
-loadMap("test")
+loadMap("platformer")
 
 
 

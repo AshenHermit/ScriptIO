@@ -236,19 +236,19 @@ gCanvas.addEventListener('mousemove', function(e){
 gCanvas.addEventListener("touchstart", function(e){
     if(e.changedTouches[0])
         onMouseDown(e.changedTouches[0], true)
-});
+}, false);
 gCanvas.addEventListener("touchend", function(e){
     if(e.changedTouches[0])
         onMouseUp(e.changedTouches[0], true)
-});
+}, false);
 gCanvas.addEventListener("touchcancel",function(e){
     if(e.changedTouches[0])
         onMouseUp(e.changedTouches[0], true)
-});
+}, false);
 gCanvas.addEventListener("touchmove", function(e){
     if(e.changedTouches[0])
         onMouseMove(e.changedTouches[0], true)
-});
+}, false);
 
 
 
