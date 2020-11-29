@@ -201,18 +201,52 @@ function mouseEvent(e, state){
     if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: code, state: state})
 }
 
-gCanvas.addEventListener('mousedown', function(e){
+function onMouseDown(e){
     if(connected) socket.emit('clientSync', {token: localPlayer.token, hp: localPlayer.hp, mousePos: localPlayer.mousePos, position: localPlayer.position});
     mouseEvent(e, true)
-})
-gCanvas.addEventListener('mouseup', function(e){
+}
+
+function onMouseUp(e){
     mouseEvent(e, false)
+}
+
+function onMouseMove(e){
+    clientMousePos.x = e.clientX
+    clientMousePos.y = e.clientY
+}
+
+gCanvas.addEventListener('mousedown', function(e){
+    onMouseDown(e)
+})
+
+gCanvas.addEventListener('mouseup', function(e){
+    onMouseUp(e)
 })
 
 gCanvas.addEventListener('mousemove', function(e){
-    clientMousePos.x = e.clientX
-    clientMousePos.y = e.clientY
+    onMouseMove(e)
 })
+
+
+
+el.addEventListener("touchstart", function(e){
+    if(e.changedTouches[0])
+        onMouseDown(e.changedTouches[0])
+});
+el.addEventListener("touchend", function(e){
+    if(e.changedTouches[0])
+        onMouseUp(e.changedTouches[0])
+});
+el.addEventListener("touchcancel",function(e){
+    if(e.changedTouches[0])
+        onMouseUp(e.changedTouches[0])
+});
+el.addEventListener("touchmove", function(e){
+    if(e.changedTouches[0])
+        onMouseMove(e.changedTouches[0])
+});
+
+
 
 window.addEventListener('resize', function(e){
     gCanvas.width = window.innerWidth
