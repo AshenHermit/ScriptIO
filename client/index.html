@@ -38,8 +38,8 @@
             <div class="bar">
                 <div onclick="onEditorShow()" class="title button">Editor</div>
                 <div onclick="onAddScript()" class="add button">+</div>
-                <div onclick="onApplyScripts()" class="item button">apply</div>
                 <div onclick="onDeployScripts()" class="item button">emit</div>
+                <div onclick="onUpdateScripts()" class="item button">update</div>
             </div>
             <div id="scripts_list" style="display: none;">
             </div>
@@ -64,6 +64,7 @@
     <div id="fps_text" class="fps-text"></div>
 
     <div class="context-menu" id="context_menu">
+        <div class="item button">emit</div>
         <div class="item button">upload to server shop</div>
         <div class="item button">disable/enable</div>
         <div class="item button">move up</div>

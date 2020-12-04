@@ -80,6 +80,38 @@ var completer = {
             meta: "(label)"
         })
 
+        completions.push({
+            name: "init",
+            caption: "init",
+            snippet: "this.init = function(player){${0}}",
+            meta: "template"
+        })
+        completions.push({
+            name: "update",
+            caption: "update",
+            snippet: "this.update = function(player){${0}}",
+            meta: "template"
+        })
+        completions.push({
+            name: "draw",
+            caption: "draw",
+            snippet: "this.draw = function(ctx, player){${0}}",
+            meta: "template"
+        })
+        completions.push({
+            name: "destroy",
+            caption: "destroy",
+            snippet: "this.destroy = function(player){${0}}",
+            meta: "template"
+        })
+
+        completions.push({
+            name: "vector2",
+            caption: "vector2",
+            snippet: "vector2(${0})",
+            meta: "(x, y)"
+        })
+
         callback(null, completions);
     }
 }

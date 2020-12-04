@@ -66,8 +66,11 @@ function cameraShake(amount){
     cameraShakeAmount += amount
 }
 
+var _nextItemUid = 0
 function addToInventory(objectProto, arrayName, name, image, creationFunction=null){
+    currentScriptCtx._registeredItems.push(_nextItemUid)
     currentScriptPlayer.inventory.push({
+        uid: _nextItemUid,
         name: name,
         image: image,
         proto: objectProto,
@@ -83,6 +86,7 @@ function addToInventory(objectProto, arrayName, name, image, creationFunction=nu
             this.scriptCtx[arrayName].push(obj)
         }
     })
+    _nextItemUid += 1
 }
 
 // pick up

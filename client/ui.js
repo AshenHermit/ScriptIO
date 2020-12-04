@@ -45,8 +45,15 @@ function onApplyScripts(){
 function onDeployScripts(){
     updateScript()
     updateScriptsList()
-    localPlayer.setupScripts(localScripts)
-    localPlayer.emitScripts()
+    localPlayer.setupScripts(localScripts, false)
+    localPlayer.emitScripts(false)
+}
+
+function onUpdateScripts(){
+    updateScript()
+    updateScriptsList()
+    localPlayer.setupScripts(localScripts, true)
+    localPlayer.emitScripts(true)
 }
 
 function onEditorShow(){
@@ -148,8 +155,15 @@ function setCtxMenuState(state){
 
 function ctxMenuFunction(e){
 
+    if(e.target.innerText == "emit"){
+        updateScriptsList()
+        localPlayer.setupScripts([localScripts[scriptId]], true, scriptId)
+        localPlayer.emitScripts(true, scriptId)
+        setCtxMenuState(false)
+    }
+
     // upload to server shop
-    if(e.target.innerText == "upload to server shop"){
+    else if(e.target.innerText == "upload to server shop"){
         let title = getScriptTitle(localScripts[scriptId])
         let id = scriptsShop.serverScripts.findIndex(x => (getScriptTitle(x) == title))
         if(id == -1){
@@ -179,9 +193,9 @@ function ctxMenuFunction(e){
         setCtxMenuState(false)
         updateScriptsList()
         if(selectedScriptId == scriptId) editor.setValue(localScripts[scriptId])
-
+    }
     // moving
-    }else if(e.target.innerText == "move up" || e.target.innerText == "move down"){
+    else if(e.target.innerText == "move up" || e.target.innerText == "move down"){
         let dir = (e.target.innerText == "move down" ? 1 : -1)
         if(!(dir == -1 && scriptId==0) && !(dir == 1 && scriptId>=localScripts.length-1)){
             var b = localScripts[scriptId];
@@ -193,9 +207,9 @@ function ctxMenuFunction(e){
             updateScriptsList()
         }
         //setCtxMenuState(false)
-
+    }
     // deleting
-    }else if(e.target.innerText == "delete"){
+    else if(e.target.innerText == "delete"){
         //let canDelete = confirm('delete script "' + ctxMenuTarget.innerText + '" ?');
         let canDelete = true;
         if(canDelete){
@@ -314,7 +328,7 @@ function updateInventoryList(){
 <div class="item button" onclick="inventoryItemSelect(this, `+id+`)">
 <div class="image"><img src="`+ item.image.src +`"/></div>
 <div class="name">`+ item.name +`</div>
-</div>`).join("")   
+</div>`).join("")
 }
 
 function onInventoryTitleClick(){

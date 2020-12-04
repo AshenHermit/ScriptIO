@@ -2,7 +2,14 @@
 function ScriptContext(script, player, i){
     this._id = i
     this._script = script
+    this._registeredItems = []
     eval(this._script)
+
+    this.__unregisterItems = function(player){
+        for (var i=0; i<this._registeredItems.length; i++){
+            player.inventory.splice(player.inventory.findIndex(this._registeredItems[i]), this._registeredItems[i], 1)
+        }
+    }
 }
 
 function Player(data){
@@ -32,6 +39,7 @@ function Player(data){
     this.position = vector2()
     this.targetPosition = vector2()
     this.mousePos = vector2()
+    this.targetMousePos = vector2()
     this.speed = 1
     this.overrideMovement = false
     this.overrideDraw = false
@@ -44,34 +52,76 @@ function Player(data){
         return this.token !== undefined
     }
 
-    this.setupScripts = function(scripts){
+    this.setupScripts = function(scripts, onlyChanged=false, scriptId=-1){
         this.rng = new RNG(new Date().getMinutes()+this.uid)
 
         inventoryList.innerHTML = ""
-        this.inventory = []
         this.selectedItem = null
 
-        for(var i=0; i<this.scriptCtx.length; i++){
-            if(this.scriptCtx[i].destroy && !this.scriptCtx[i].disabled){
-                this.scriptCtx[i].destroy(this)
-            }
-        }
-        this.scriptCtx = []
         currentScriptPlayer = this
-        for(var i=0; i<scripts.length; i++){
-            this.scriptCtx.push(new ScriptContext(scripts[i], this, i))
 
-            currentScriptCtx = this.scriptCtx[i]
-                
-            if(this.scriptCtx[i].init && !this.scriptCtx[i].disabled){
-                this.scriptCtx[i].init(this)
+        if(onlyChanged){
+            for(var s=0; s<scripts.length; s++){
+                let finded = false
+                for(var c=0; c<this.scriptCtx.length; c++){
+                    if(getScriptTitle(this.scriptCtx[c]._script) == getScriptTitle(scripts[s])){
+                        finded = true
+                        if(this.scriptCtx[c]._script != scripts[s]){
+                            if(this.scriptCtx[c].destroy && !this.scriptCtx[c].disabled){
+                                this.scriptCtx[c].destroy(this)
+                            }
+                            this.scriptCtx[c].__unregisterItems(this)
+
+                            this.scriptCtx[c] = new ScriptContext(scripts[s], this, s)
+
+                            currentScriptCtx = this.scriptCtx[c]
+                    
+                            if(this.scriptCtx[c].init && !this.scriptCtx[c].disabled){
+                                this.scriptCtx[c].init(this)
+                            }
+                        }
+                    }
+                }    
+                if(!finded){
+                    this.scriptCtx.splice(s, 0, new ScriptContext(scripts[s], this, s))
+                    currentScriptCtx = this.scriptCtx[s]
+
+                    if(currentScriptCtx.init && !currentScriptCtx.disabled){
+                        currentScriptCtx.init(this)
+                    }
+                }   
+            }
+        }else{
+            _nextItemUid = 0
+            this.inventory = []
+
+            for(var i=0; i<this.scriptCtx.length; i++){
+                if(this.scriptCtx[i].destroy && !this.scriptCtx[i].disabled){
+                    this.scriptCtx[i].destroy(this)
+                }
+            }
+
+            this.scriptCtx = []
+
+            for(var i=0; i<scripts.length; i++){
+                this.scriptCtx.push(new ScriptContext(scripts[i], this, i))
+    
+                currentScriptCtx = this.scriptCtx[i]
+                    
+                if(this.scriptCtx[i].init && !this.scriptCtx[i].disabled){
+                    this.scriptCtx[i].init(this)
+                }
             }
         }
 
         updateInventoryList()
     }
-    this.emitScripts = function(){
-        socket.emit('clientSetupScripts', {token: this.token, scripts: this.scriptCtx.map(x=>x._script)});
+    this.emitScripts = function(onlyChanged=false, scriptId=-1){
+        if(scriptId==-1){
+            socket.emit('clientSetupScripts', {token: this.token, onlyChanged: onlyChanged, scriptId: -1, scripts: this.scriptCtx.map(x=>x._script)});
+        }else{
+            socket.emit('clientSetupScripts', {token: this.token, onlyChanged: onlyChanged, scriptId: scriptId, scripts: [this.scriptCtx[scriptId]]});
+        }
     }
 
     this.update = function(){
@@ -115,6 +165,8 @@ function Player(data){
         }else{
             this.velocity._set(this.targetPosition.sub(this.position)._div(5))
             this.position._add(this.velocity)
+            this.mousePos.x += (this.targetMousePos.x - this.mousePos.x) / 4
+            this.mousePos.y += (this.targetMousePos.y - this.mousePos.y) / 4
         }
 
         //

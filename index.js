@@ -231,7 +231,11 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('clientSetupScripts', function (data) {
         data.uid = playerByToken[data.token].uid
-        playerByToken[data.token].scripts = data.scripts
+        if(data.scriptId==-1){
+            playerByToken[data.token].scripts = data.scripts
+        }else{
+            playerByToken[data.token].scripts[data.scriptId] = data.scripts[0]
+        }
         delete data.token
         io.sockets.emit('serverClientSetupScripts', data);
     });

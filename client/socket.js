@@ -8,7 +8,7 @@ socket.on('local_connect', function (data) {
     //data.connections.reverse()
     for(var i=0; i<data.connections.length; i++){
         var newPlayer = new Player({uid: data.connections[i].uid})
-        newPlayer.setupScripts(data.connections[i].scripts)
+        newPlayer.setupScripts(data.connections[i].scripts, false)
         playerByUid[data.connections[i].uid] = newPlayer
         players.unshift(newPlayer)
     }
@@ -31,7 +31,7 @@ socket.on('playerConnected', function (data) {
 });
 socket.on('serverPlayerDisconnect', function (data) {
     var playerId = getPlayerIdByUid(data.uid)
-    playerByUid[data.uid].setupScripts([])
+    playerByUid[data.uid].setupScripts([], false)
     playerByUid[data.uid] = undefined
     players.splice(playerId, 1)
 });
@@ -39,7 +39,7 @@ socket.on('serverPlayerDisconnect', function (data) {
 socket.on('serverClientSync', function (data) {
     if(data.uid!=localPlayer.uid){
         playerByUid[data.uid].targetPosition._set(data.position)
-        playerByUid[data.uid].mousePos._set(data.mousePos)
+        playerByUid[data.uid].targetMousePos._set(data.mousePos)
         playerByUid[data.uid].hp = data.hp
     }
 });
@@ -63,7 +63,7 @@ socket.on('serverClientSyncControls', function (data) {
 
 socket.on('serverClientSetupScripts', function (data) {
     if(data.uid!=localPlayer.uid)
-        playerByUid[data.uid].setupScripts(data.scripts)
+        playerByUid[data.uid].setupScripts(data.scripts, data.onlyChanged, data.scriptId)
 });
 
 socket.on('serverLoadMap', function (data) {
