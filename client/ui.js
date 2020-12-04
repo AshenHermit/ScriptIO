@@ -84,29 +84,40 @@ fileInput.onchange = function(){
 
 // hotkeys: ctrl shift s, ctrl s ...
 document.addEventListener("keydown", function(e) {
-    //save
-    if (e.ctrlKey && e.shiftKey && e.code == "KeyS") {
-        e.preventDefault()
-        download(JSON.stringify({scripts: localScripts}, 0, 4), "scriptIoSave.json", "text/plain")
-    }else
-    if (e.ctrlKey && e.code == "KeyS") {
-        e.preventDefault()
-        updateScript()
-        updateScriptsList()
-    }
+    if(promptState){
+        if (e.code == "Enter") {
+            promptState = false
+            promptEl.style.display = "none"
+            promptCallback(document.getElementById("prompt_input").value)
+            document.getElementById("prompt_input").value = ""
+            document.body.focus()
+        }
+    }else{
 
-    //open
-    if (e.ctrlKey && e.shiftKey && e.code == "KeyO") {
-        e.preventDefault()
-        fileInput.click()
-    }
+        //save
+        if (e.ctrlKey && e.shiftKey && e.code == "KeyS") {
+            e.preventDefault()
+            download(JSON.stringify({scripts: localScripts}, 0, 4), "scriptIoSave.json", "text/plain")
+        }else
+        if (e.ctrlKey && e.code == "KeyS") {
+            e.preventDefault()
+            updateScript()
+            updateScriptsList()
+        }
 
-    //disconnect
-    if (e.ctrlKey && e.shiftKey && e.code == "KeyD") {
-        e.preventDefault()
-        connected = false
-        socket.emit('clientDisconnect', {token: localPlayer.token});
-        setTimeout(()=>{window.close()}, 1000)
+        //open
+        if (e.ctrlKey && e.shiftKey && e.code == "KeyO") {
+            e.preventDefault()
+            fileInput.click()
+        }
+
+        //disconnect
+        if (e.ctrlKey && e.shiftKey && e.code == "KeyD") {
+            e.preventDefault()
+            connected = false
+            socket.emit('clientDisconnect', {token: localPlayer.token});
+            setTimeout(()=>{window.close()}, 1000)
+        }
     }
 
 }, false)
@@ -192,6 +203,8 @@ function ctxMenuFunction(e){
             if(selectedScriptId == scriptId){
                 editor.setValue("")
                 selectedScriptId = -1
+            }else if(scriptId < selectedScriptId){
+                selectedScriptId -= 1
             }
             updateScriptsList()
         }

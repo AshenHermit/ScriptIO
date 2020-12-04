@@ -12,11 +12,16 @@
 </head>
 <body>
     <canvas id="game_canvas"></canvas>
-    <div class="screen-block" style="display: none;">
-        <div class="main-menu">
+    <div class="screen-block">
+        <div class="main-menu" style="display: none;">
             <div class="title">Script io</div>
             <input type="text" name="script-io-username" id="main-menu-username">
             <button>Play</button>
+        </div>
+
+        <div class="prompt" id="prompt" style="display: none;">
+            <div class="label">label</div>
+            <div class="input"><input type="text" autocomplete="off" id="prompt_input"></div>
         </div>
     </div>
 
@@ -52,6 +57,8 @@
                 
             </div>
         </div>
+
+        
     </div>
 
     <div id="fps_text" class="fps-text"></div>

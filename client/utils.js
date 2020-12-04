@@ -28,7 +28,6 @@ function getScriptShopItem(s, i, globalCategory=true){
         if(s.charAt(nl1+1) == "/") {
             description = getScriptDescription(s)
         }
-        console.log(globalCategory)
 
         return `
 <div class="item">
@@ -37,6 +36,26 @@ function getScriptShopItem(s, i, globalCategory=true){
     <div class="description">`+description+`</div>
     <div onclick="loadScriptFromShop(`+i+`, `+globalCategory+`)" class="load-button button">load</div>
 </div>`
+}
+
+function random(){
+    return currentScriptPlayer.random()
+}
+
+function inputText(label, callback){
+    promptState = true
+    promptEl.style.display = ""
+    promptEl.children[0].innerHTML = label
+    document.getElementById("prompt_input").focus()
+
+    promptCallback = callback
+}
+
+function broadcast(player, data, recieveFuncName){
+    if(player.token){
+        let d = Object.assign(data, {_token: player.token, _receiveFuncName: recieveFuncName, _scriptCtxId: currentScriptCtx._id})
+        socket.emit('clientBroadcast', d)
+    }
 }
 
 function getPlayerIdByUid(uid){
@@ -82,11 +101,11 @@ function getObjectIdOnPosition(array, pos){
 }
 
 function pickUpObjectInArray(arrayName){
-    if(currentScriptPlayer.token){
-        let id = getObjectIdOnPosition(currentScriptCtx[arrayName], currentScriptPlayer.mousePos)
+    if(localPlayer.onPress["MouseL"]){
+        let id = getObjectIdOnPosition(currentScriptCtx[arrayName], localPlayer.mousePos)
         if(id != -1){
-            currentScriptPlayer.itemInHands = currentScriptCtx[arrayName][id];
-            socket.emit('clientObjectPickUp', {token: currentScriptPlayer.token, objId: id, arrayName: arrayName, scriptCtxId: currentScriptCtx._id})
+            localPlayer.itemInHands = currentScriptCtx[arrayName][id];
+            socket.emit('clientObjectPickUp', {token: localPlayer.token, scriptPlayerUid: currentScriptPlayer.uid, objId: id, arrayName: arrayName, scriptCtxId: currentScriptCtx._id})
         }
     }
 }

@@ -259,4 +259,10 @@ io.sockets.on('connection', function (socket) {
         delete data.token
         io.sockets.emit('serverSelectInventoryItem', data);
     })
+
+    socket.on('clientBroadcast', function(data){
+        data._uid = playerByToken[data._token].uid
+        delete data._token
+        io.sockets.emit('serverClientBroadcast', data);
+    })
 })

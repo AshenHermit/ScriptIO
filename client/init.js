@@ -61,17 +61,23 @@ var functions = [
     addTransform,
 
     addToInventory,
+
+    broadcast,
+
+    random,
 ]
 
 var completer = {
     getCompletions: function(editor, session, pos, prefix, callback) {
         var completions = functions.map(functionToSnippet);
+
         completions.push({
-            name: "random",
-            caption: "random",
-            snippet: "player.random()",
-            meta: "player.random()"
+            name: "inputText",
+            caption: "inputText",
+            snippet: "inputText(${1:label}, (value)=>{${0}})",
+            meta: "(label)"
         })
+
         callback(null, completions);
     }
 }
@@ -149,6 +155,11 @@ var selectedItem = null
 
 var currentScriptCtx = null
 var currentScriptPlayer = null
+
+// prompt
+var promptState = false
+var promptEl = document.getElementById("prompt")
+var promptCallback = null
 
 //map 
 //gameMap.colliders.push(new Collider(-512, 32, 1024, 32))

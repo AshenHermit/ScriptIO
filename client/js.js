@@ -171,43 +171,50 @@ window.onbeforeunload = function(e){
 }
 
 document.addEventListener('keydown', function(e){
-    //if(localPlayer.isPressed[e.code] !== undefined && document.activeElement == document.body){
-    if(document.activeElement == document.body){
-        if(!localPlayer.isPressed[e.code]){
-            localPlayer.isPressed[e.code] = true
-            localPlayer.onPress[e.code] = true
-            if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: e.code, state: true})
+    if(!promptState){
+        //if(localPlayer.isPressed[e.code] !== undefined && document.activeElement == document.body){
+        if(document.activeElement == document.body){
+            if(!localPlayer.isPressed[e.code]){
+                localPlayer.isPressed[e.code] = true
+                localPlayer.onPress[e.code] = true
+                if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: e.code, state: true})
+            }
         }
     }
 })
 
 document.addEventListener('keyup', function(e){
     //if(localPlayer.isPressed[e.code] !== undefined && document.activeElement == document.body){
-    if(document.activeElement == document.body){
+    //if(document.activeElement == document.body){
+        if(true){
         localPlayer.isPressed[e.code] = false
         if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: e.code, state: false})
     }
 })
 
 function mouseEvent(e, state, isTouch=false){
-    let code = "MouseM"
-    if(isTouch){
-        code = "MouseL"
-    }else{
-        if(e.button == 0)
+    if(!promptState){
+        let code = "MouseM"
+        if(isTouch){
             code = "MouseL"
-        else if(e.button == 2)
-            code = "MouseR"
-    }
+        }else{
+            if(e.button == 0)
+                code = "MouseL"
+            else if(e.button == 2)
+                code = "MouseR"
+        }
 
-    localPlayer.onPress[code] = state
-    localPlayer.isPressed[code] = state
-    if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: code, state: state})
+        localPlayer.onPress[code] = state
+        localPlayer.isPressed[code] = state
+        if(connected) socket.emit('clientSyncControls', {token: localPlayer.token, control: code, state: state})
+    }
 }
 
 function onMouseDown(e, isTouch=false){
-    if(connected) socket.emit('clientSync', {token: localPlayer.token, hp: localPlayer.hp, mousePos: localPlayer.mousePos, position: localPlayer.position});
-    mouseEvent(e, true, isTouch)
+    if(!promptState){
+        if(connected) socket.emit('clientSync', {token: localPlayer.token, hp: localPlayer.hp, mousePos: localPlayer.mousePos, position: localPlayer.position});
+        mouseEvent(e, true, isTouch)
+    }
 }
 
 function onMouseUp(e, isTouch=false){
