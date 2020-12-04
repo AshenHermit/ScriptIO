@@ -22,7 +22,9 @@ function functionToSnippet(func){
     .replaceAll(")", "")
     .split(",")
     .forEach((arg)=>{
-        snippetArgs.push("${" + (snippetArgs.length+1) + ":" + arg.split("=")[0] + "}")
+        let a = arg.split("=")[0]
+        if(a=="scriptCtx") a = "this"
+        snippetArgs.push("${" + (snippetArgs.length+1) + ":" + a + "}")
     })
 
     return {

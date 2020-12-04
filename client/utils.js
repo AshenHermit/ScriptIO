@@ -51,9 +51,9 @@ function inputText(label, callback){
     promptCallback = callback
 }
 
-function broadcast(player, data, recieveFuncName){
+function broadcast(player, scriptCtx, data, recieveFuncName){
     if(player.token){
-        let d = Object.assign(data, {_token: player.token, _receiveFuncName: recieveFuncName, _scriptCtxId: currentScriptCtx._id})
+        let d = Object.assign(data, {_token: player.token, _receiveFuncName: recieveFuncName, _scriptCtxId: scriptCtx._id})
         socket.emit('clientBroadcast', d)
     }
 }
