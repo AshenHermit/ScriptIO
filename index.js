@@ -203,6 +203,9 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('clientDisconnect', function (data) {
         var id = getPlayerIdByToken(data.token)
+        if(id==-1){
+            return
+        }
         io.sockets.emit('serverPlayerDisconnect', {uid: players[id].uid});
         delete playerByUid[players[id].uid]
         delete playerByToken[players[id].token]
@@ -212,24 +215,28 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('clientSync', function (data) {
+        if(!(data.token in playerByToken)) return
         data.uid = playerByToken[data.token].uid
         delete data.token
         io.sockets.emit('serverClientSync', data);
     });
 
     socket.on('clientSyncControls', function (data) {
+        if(!(data.token in playerByToken)) return
         data.uid = playerByToken[data.token].uid
         delete data.token
         io.sockets.emit('serverClientSyncControls', data);
     });
 
     socket.on('clientSyncInstantiate', function (data) {
+        if(!(data.token in playerByToken)) return
         data.uid = playerByToken[data.token].uid
         delete data.token
         io.sockets.emit('serverClientSyncInstantiate', data);
     });
 
     socket.on('clientSetupScripts', function (data) {
+        if(!(data.token in playerByToken)) return
         data.uid = playerByToken[data.token].uid
         if(data.scriptId==-1){
             playerByToken[data.token].scripts = data.scripts
@@ -253,18 +260,21 @@ io.sockets.on('connection', function (socket) {
     })
 
     socket.on('clientObjectPickUp', function(data){
+        if(!(data.token in playerByToken)) return
         data.uid = playerByToken[data.token].uid
         delete data.token
         io.sockets.emit('serverClientObjectPickUp', data);
     })
 
     socket.on('clientSelectInventoryItem', function(data){
+        if(!(data.token in playerByToken)) return
         data.uid = playerByToken[data.token].uid
         delete data.token
         io.sockets.emit('serverSelectInventoryItem', data);
     })
 
     socket.on('clientBroadcast', function(data){
+        if(!(data.token in playerByToken)) return
         data._uid = playerByToken[data._token].uid
         delete data._token
         io.sockets.emit('serverClientBroadcast', data);
